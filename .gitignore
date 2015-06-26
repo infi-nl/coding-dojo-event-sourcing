@@ -165,3 +165,7 @@ pip-log.txt
 /mvc3/NerdDinner/App_Data/ASPNETDB.MDF
 /mvc3/NerdDinner/App_Data/aspnetdb_log.LDF
 /mvc3/NerdDinner/App_Data/NerdDinner.mdf
+/NerdDinner/App_Data/NerdDinner.mdf
+/NerdDinner/App_Data/NerdDinner_log.ldf
+/NerdDinner/App_Data/aspnetdb.mdf
+/NerdDinner/App_Data/aspnetdb_log.ldf
