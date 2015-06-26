@@ -161,3 +161,7 @@ pip-log.txt
 
 # Mac crap
 .DS_Store
+/mvc3/NerdDinner/App_Data/NerdDinner_log.ldf
+/mvc3/NerdDinner/App_Data/ASPNETDB.MDF
+/mvc3/NerdDinner/App_Data/aspnetdb_log.LDF
+/mvc3/NerdDinner/App_Data/NerdDinner.mdf
