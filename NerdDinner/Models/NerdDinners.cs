@@ -3,6 +3,7 @@ using System.Data.Common;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
 using System.Data.SqlClient;
+using DDay.iCal;
 using StackExchange.Profiling;
 using StackExchange.Profiling.Data;
 
@@ -15,7 +16,8 @@ namespace NerdDinner.Models
         DbEntityEntry Entry(object entity);
 
         DbSet<Dinner> Dinners { get; set; }
-        DbSet<RSVP> RSVPs { get; set; }
+        //DbSet<RSVP> RSVPs { get; set; }
+        DbSet<Models.Event> Events { get; set; }
     }
 
     public class NerdDinners : DbContext, INerdDinners
@@ -37,6 +39,9 @@ namespace NerdDinner.Models
         }
 
         public DbSet<Dinner> Dinners { get; set; }
-        public DbSet<RSVP> RSVPs { get; set; }
+        //public DbSet<RSVP> RSVPs { get; set; }
+
+        public DbSet<Event> Events { get; set; }
+
     }
 }

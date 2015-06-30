@@ -12,6 +12,7 @@ namespace NerdDinner.Controllers
     {
 
         IDinnerRepository dinnerRepository;
+        
 
         //
         // Dependency Injection enabled constructors
@@ -32,16 +33,14 @@ namespace NerdDinner.Controllers
         {
             Dinner dinner = dinnerRepository.Find(id);
 
-            if (!dinner.IsUserRegistered(User.Identity.Name))
-            {
-                RSVP rsvp = new RSVP();
-                NerdIdentity nerd = (NerdIdentity)User.Identity;
-                rsvp.AttendeeNameId = nerd.Name;
-                rsvp.AttendeeName = nerd.FriendlyName;
+            NerdIdentity nerd = (NerdIdentity)User.Identity;
 
-                dinner.RSVPs.Add(rsvp);
-                dinnerRepository.SubmitChanges();
-            }
+            dinner.RSVP(nerd.Name, nerd.FriendlyName);
+
+            dinnerRepository.StoreEventsForDinner(dinner);
+
+            dinnerRepository.SubmitChanges();
+            
 
             return Content("Thanks - we'll see you there!");
         }
@@ -52,16 +51,17 @@ namespace NerdDinner.Controllers
         [Authorize, HttpPost]
         public ActionResult Cancel(int id)
         {
-            Dinner dinner = dinnerRepository.Find(id);
+            throw new NotImplementedException("Dojo ftw");
+            //Dinner dinner = dinnerRepository.Find(id);
 
-            RSVP rsvp = dinner.RSVPs.SingleOrDefault(r => this.User.Identity.Name == (r.AttendeeNameId ?? r.AttendeeName));
-            if (rsvp != null)
-            {
-                dinnerRepository.DeleteRsvp(rsvp);
-                dinnerRepository.SubmitChanges();
-            }
+            //RSVP rsvp = dinner.RSVPs.SingleOrDefault(r => this.User.Identity.Name == (r.AttendeeNameId ?? r.AttendeeName));
+            //if (rsvp != null)
+            //{
+            //    dinnerRepository.DeleteRsvp(rsvp);
+            //    dinnerRepository.SubmitChanges();
+            //}
 
-            return Content("Sorry you can't make it!");
+            //return Content("Sorry you can't make it!");
         }
 
         

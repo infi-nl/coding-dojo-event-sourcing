@@ -134,13 +134,8 @@ namespace NerdDinner.Controllers {
                 dinner.HostedById = this.nerdIdentity.Name;
                 dinner.HostedBy = this.nerdIdentity.FriendlyName;
 
-                RSVP rsvp = new RSVP();
-                rsvp.AttendeeNameId = this.nerdIdentity.Name;
-                rsvp.AttendeeName = this.nerdIdentity.FriendlyName;
-
-                dinner.RSVPs = new List<RSVP>();
-                dinner.RSVPs.Add(rsvp);
-
+                dinner.RSVP(this.nerdIdentity.Name, this.nerdIdentity.FriendlyName);
+ 
                 dinnerRepository.InsertOrUpdate(dinner);
                 dinnerRepository.SubmitChanges();
 

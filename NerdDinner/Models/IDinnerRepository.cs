@@ -1,4 +1,5 @@
-﻿using System.Linq;
+﻿using System.Collections.Generic;
+using System.Linq;
 
 namespace NerdDinner.Models {
 
@@ -7,6 +8,8 @@ namespace NerdDinner.Models {
         IQueryable<Dinner> FindByLocation(float latitude, float longitude);
         IQueryable<Dinner> FindUpcomingDinners();
         IQueryable<Dinner> FindDinnersByText(string q);
-        void DeleteRsvp(RSVP rsvp);
+        
+
+        void StoreEventsForDinner(Dinner dinner);
     }
 }

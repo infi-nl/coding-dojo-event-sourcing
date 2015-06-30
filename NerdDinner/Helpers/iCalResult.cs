@@ -6,6 +6,7 @@ using DDay.iCal;
 using DDay.iCal.Serialization.iCalendar;
 using NerdDinner.Helpers;
 using NerdDinner.Models;
+using Event = DDay.iCal.Event;
 
 namespace NerdDinner.Controllers
 {

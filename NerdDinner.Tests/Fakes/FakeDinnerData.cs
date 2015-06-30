@@ -9,17 +9,20 @@ namespace NerdDinner.Tests.Fakes
 {
     class FakeDinnerData
     {
-        public static List<Dinner> CreateTestDinners()
+        public static Tuple<List<Dinner>, List<Event>> CreateTestDinners()
         {
 
             List<Dinner> dinners = new List<Dinner>();
+            List<Event> events = new List<Event>();
 
             for (int i = 1; i <= 101; i++)
             {
 
+
                 Dinner sampleDinner = new Dinner()
                 {
                     DinnerID = i,
+                    DinnerGuid = Guid.NewGuid(),
                     Title = "Sample Dinner",
                     HostedBy = "SomeUser",
                     Address = "Some Address",
@@ -28,20 +31,19 @@ namespace NerdDinner.Tests.Fakes
                     Description = "Some description",
                     EventDate = DateTime.Now.AddDays(i),
                     Latitude = 99,
-                    Longitude = -99,
-                    RSVPs = new List<RSVP>()
+                    Longitude = -99
                 };
-
-                RSVP rsvp = new RSVP();
-                rsvp.RsvpID = i;
-                rsvp.DinnerID = sampleDinner.DinnerID;
-                rsvp.AttendeeName = "SomeUser";
-                sampleDinner.RSVPs.Add(rsvp);
-
                 dinners.Add(sampleDinner);
+
+                var e = new Event();
+                e.Data = @"{""Name"":""SomeUser"",""FriendlyName"":""SomeUser""}";
+                e.EventType = "NerdDinner.Events.RSVPed";
+                e.DateTime = DateTime.UtcNow;
+                e.AggregateId = sampleDinner.DinnerGuid;
+                events.Add(e);
             }
 
-            return dinners;
+            return Tuple.Create(dinners, events);
         }
 
         public static Dinner CreateDinner()

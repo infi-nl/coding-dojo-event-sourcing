@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Web.Mvc;
+using NerdDinner.Events;
+using Newtonsoft.Json;
 
 namespace NerdDinner.Models
 {
@@ -10,6 +13,9 @@ namespace NerdDinner.Models
     {
         [HiddenInput(DisplayValue = false)]
         public int DinnerID { get; set; }
+
+        [HiddenInput(DisplayValue = false)]
+        public Guid DinnerGuid { get; set; }
 
         [Required(ErrorMessage = "Title is required")]
         [StringLength(50, ErrorMessage = "Title may not be longer than 50 characters")]
@@ -50,7 +56,13 @@ namespace NerdDinner.Models
         [HiddenInput(DisplayValue = false)]
         public string HostedById { get; set; }
 
-        public virtual ICollection<RSVP> RSVPs { get; set; }
+        private List<RSVP> _rsvps = new List<RSVP>();
+        public ICollection<RSVP> RSVPs {
+            get {
+                return _rsvps.AsReadOnly();
+            }
+        }
+
 
         public bool IsHostedBy(string userName)
         {
@@ -76,6 +88,53 @@ namespace NerdDinner.Models
                 this.Longitude = value.Longitude;
                 this.Title = value.Title;
                 this.Address = value.Address;
+            }
+        }
+
+        public void RSVP(string name, string friendlyName) {
+            if (IsUserRegistered(name)) {
+                return;
+            }
+
+            RaiseEvent(new RSVPed {
+                Name = name,
+                FriendlyName = friendlyName
+            });
+
+            //RSVP rsvp = new RSVP();
+
+            //rsvp.AttendeeNameId = name;
+            //rsvp.AttendeeName = friendlyName;
+
+            //RSVPs.Add(rsvp);
+        }
+
+        private readonly List<object> _publishedEvents = new List<object>();
+        public ICollection<Event> PublishedEvents { // TODO JB make read only
+            get {
+                return this._publishedEvents.Select(pe => new Event { AggregateId = DinnerGuid, DateTime = DateTime.UtcNow, EventType = pe.GetType().FullName, Data = JsonConvert.SerializeObject(pe) }).ToList();
+            }
+        } 
+
+        private void RaiseEvent(object eventObject) {
+            _publishedEvents.Add(eventObject);
+        }
+
+        void ApplyEvent(RSVPed rsvpedEvent) {
+            var rsvp = new RSVP();
+            rsvp.DinnerID = this.DinnerID;
+            rsvp.AttendeeName = rsvpedEvent.FriendlyName;
+            rsvp.AttendeeNameId = rsvpedEvent.Name;
+            _rsvps.Add(rsvp);
+        }
+
+        public void Hydrate(ICollection<Event> events)
+        {
+            foreach (var e in events)
+            { // TODO JB order events
+                var type = Type.GetType(e.EventType);
+                dynamic data = JsonConvert.DeserializeObject(e.Data, type);
+                ((dynamic)this).ApplyEvent(data);
             }
         }
     }

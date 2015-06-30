@@ -7,7 +7,7 @@ namespace NerdDinner.Models
     public interface IRepository<T>
     {
         IQueryable<T> All { get; }
-        IQueryable<T> AllIncluding(params Expression<Func<T, object>>[] includeProperties);
+        //IQueryable<T> AllIncluding(params Expression<Func<T, object>>[] includeProperties);
         T Find(int id);
         void InsertOrUpdate(T dinner);
         void Delete(int id);

@@ -62,8 +62,7 @@ namespace NerdDinner.Tests.Controllers
                     Description = "Some description",
                     EventDate = DateTime.Parse("01/01/2011"),
                     Latitude = 99,
-                    Longitude = -99,
-                    RSVPs = new List<RSVP>()
+                    Longitude = -99
                 }
             
             };
@@ -255,7 +254,7 @@ namespace NerdDinner.Tests.Controllers
             var dinner = FakeDinnerData.CreateDinner();
             dinner.EventDate = DateTime.Now.AddHours(1);
             dinner.Title = "Dinner which just started";
-            testData.Add(dinner);
+            testData.Item1.Add(dinner);
             var repository = new FakeDinnerRepository(testData);
             var nerdIdentity = FakeIdentity.CreateIdentity("SomeUser");
 
@@ -279,7 +278,7 @@ namespace NerdDinner.Tests.Controllers
             var testData = FakeDinnerData.CreateTestDinners();
             var dinner = FakeDinnerData.CreateDinner();
             dinner.Title = searchterm;
-            testData.Add(dinner);
+            testData.Item1.Add(dinner);
             var repository = new FakeDinnerRepository(testData);
             var nerdIdentity = FakeIdentity.CreateIdentity("SomeUser");
 

@@ -22,17 +22,20 @@ namespace NerdDinner.Tests.EventSourcingDojo
 
 
 
-        private void AssertRSVPedForDinner(string userName, int dinnerId) {
+        
+
+        private void RSVPForDinner(string userName, int dinnerId) {
+            var controller = CreateRSVPControllerAs(userName);
+            controller.Register(dinnerId);
+        }
+
+        private void AssertRSVPedForDinner(string userName, int dinnerId)
+        {
             var dinnerDetails = GetDinnerDetails(dinnerId);
 
             var expectedRSVP = dinnerDetails.RSVPs.SingleOrDefault(rsvp => rsvp.AttendeeName == userName);
 
             Assert.IsNotNull(expectedRSVP, "RSVP for user {0} not found", userName);
-        }
-
-        private void RSVPForDinner(string userName, int dinnerId) {
-            var controller = CreateRSVPControllerAs(userName);
-            controller.Register(dinnerId);
         }
 
         private Dinner GetDinnerDetails(int dinnerId)

@@ -11,14 +11,20 @@ namespace NerdDinner.Tests.Fakes
     public class FakeDinnerRepository : IDinnerRepository
     {
         private List<Dinner> context;
+        private List<Event> events;
 
-        public FakeDinnerRepository(List<Dinner> dinners)
+        public FakeDinnerRepository(Tuple<List<Dinner>, List<Event>> data)
         {
-            context = dinners;
+            context = data.Item1;
+            this.events = data.Item2;
         }
 
         public void DeleteRsvp(RSVP rsvp)
         {            
+        }
+
+        public void StoreEventsForDinner(Dinner dinner) {
+            events.AddRange(dinner.PublishedEvents);
         }
 
         public IQueryable<Dinner> FindByLocation(float latitude, float longitude)
@@ -66,7 +72,9 @@ namespace NerdDinner.Tests.Fakes
 
         public Dinner Find(int id)
         {
-            return context.Find(x => x.DinnerID == id);
+            var dinner = context.Find(x => x.DinnerID == id);
+            dinner.Hydrate(events.Where(e => e.AggregateId == dinner.DinnerGuid).ToList());
+            return dinner;
         }
 
         public void InsertOrUpdate(Dinner dinner)
@@ -74,8 +82,7 @@ namespace NerdDinner.Tests.Fakes
             context.Add(dinner);
         }
 
-        public void SubmitChanges()
-        {
+        public void SubmitChanges() {
         }
     }
 }

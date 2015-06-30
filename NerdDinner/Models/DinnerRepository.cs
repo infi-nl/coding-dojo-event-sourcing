@@ -5,6 +5,7 @@ using System.Data.Entity;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Web.Mvc;
+using Newtonsoft.Json;
 
 namespace NerdDinner.Models
 {
@@ -18,14 +19,15 @@ namespace NerdDinner.Models
 
             foreach (Dinner dinner in results)
             {
-                dinner.RSVPs = new List<RSVP>();
+                // TODO JB
+                //dinner.RSVPs = new List<RSVP>();
 
-                var rsvps = db.RSVPs.Where(x => x.DinnerID == dinner.DinnerID);
+                //var rsvps = db.RSVPs.Where(x => x.DinnerID == dinner.DinnerID);
 
-                foreach (RSVP rsvp in rsvps)
-                {
-                    dinner.RSVPs.Add(rsvp);
-                }
+                //foreach (RSVP rsvp in rsvps)
+                //{
+                //    dinner.RSVPs.Add(rsvp);
+                //}
             }
 
             return results.AsQueryable<Dinner>();
@@ -52,21 +54,18 @@ namespace NerdDinner.Models
             get { return db.Dinners.Include(r => r.RSVPs); }
         }
 
-        public IQueryable<Dinner> AllIncluding(params Expression<Func<Dinner, object>>[] includeProperties)
-        {
-            IQueryable<Dinner> query = All;
-            foreach (Expression<Func<Dinner, object>> includeProperty in includeProperties)
-            {
-                query = query.Include(includeProperty);
-            }
-            return query;
-        }
-
         public Dinner Find(int id)
         {
-            return All
-                .SingleOrDefault(d => d.DinnerID == id);
+            var dinner = All.Select(_=> new {
+                dinner = _,
+                events = db.Events.Where(e=>e.AggregateId == _.DinnerGuid)
+            }).SingleOrDefault(d => d.dinner.DinnerID == id);
+
+            dinner.dinner.Hydrate(dinner.events.ToList());
+            return dinner.dinner;
         }
+
+        
 
         //
         // Insert/Delete Methods
@@ -88,16 +87,21 @@ namespace NerdDinner.Models
         public void Delete(int id)
         {
             var dinner = Find(id);
-            foreach (RSVP rsvp in dinner.RSVPs.ToList())
-                db.RSVPs.Remove(rsvp);
             db.Dinners.Remove(dinner);
         }
 
-        public void DeleteRsvp(RSVP rsvp)
-        {
-            db.RSVPs.Remove(rsvp);
-            db.SaveChanges();
+        public void StoreEventsForDinner(Dinner dinner) {
+            foreach (var publishedEvent in dinner.PublishedEvents) {
+                var e = new Event();
+                e.AggregateId = dinner.DinnerGuid;
+                e.Data        = JsonConvert.SerializeObject(publishedEvent);
+                e.DateTime    = DateTime.UtcNow;
+
+                db.Events.Add(e);
+            }
         }
+
+        //private List<RSVP> GetRSVP
 
         //
         // Persistence 

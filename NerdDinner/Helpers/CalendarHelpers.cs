@@ -1,6 +1,7 @@
 ﻿using System;
 using NerdDinner.Models;
 using DDay.iCal;
+using Event = DDay.iCal.Event;
 
 namespace NerdDinner.Helpers
 {

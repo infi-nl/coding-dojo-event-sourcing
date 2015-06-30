@@ -109,6 +109,9 @@
     <Reference Include="MiniProfiler.EntityFramework">
       <HintPath>..\packages\MiniProfiler.EF.2.0.3\lib\net40\MiniProfiler.EntityFramework.dll</HintPath>
     </Reference>
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.7.0.1\lib\net40\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="OpenSearchToolkit, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\OpenSearchToolkit.1.1\lib\OpenSearchToolkit.dll</HintPath>
     </Reference>
@@ -181,6 +184,8 @@
     <Compile Include="Helpers\UnityDependencyResolver.cs" />
     <Compile Include="Helpers\UrlHelperExtensions.cs" />
     <Compile Include="Models\AccountModels.cs" />
+    <Compile Include="Models\Event.cs" />
+    <Compile Include="Events\RSVPed.cs" />
     <Compile Include="Models\Dinner.cs" />
     <Compile Include="Models\DinnerRepository.cs" />
     <Compile Include="Models\FlairViewModel.cs" />
