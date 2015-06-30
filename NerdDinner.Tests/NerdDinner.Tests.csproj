@@ -132,6 +132,7 @@
     <Compile Include="Controllers\RSVPControllerTest.cs" />
     <Compile Include="Controllers\SearchControllerTest.cs" />
     <Compile Include="Controllers\DinnersControllerTest.cs" />
+    <Compile Include="EventSourcingDojo\RSVPControllerTest.cs" />
     <Compile Include="Fakes\FakeDinnerData.cs" />
     <Compile Include="Fakes\FakeDinnerRepository.cs" />
     <Compile Include="Fakes\FakeIdentity.cs" />
@@ -184,6 +185,7 @@
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(SolutionDir)\.nuget\NuGet.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
