@@ -17,7 +17,7 @@ namespace NerdDinner.Controllers
 
         IDinnerRepository dinnerRepository;
 
-        private static OpenIdRelyingParty relyingParty = new OpenIdRelyingParty(null);
+        //private static OpenIdRelyingParty relyingParty = new OpenIdRelyingParty(null);
 
         //
         // Dependency Injection enabled constructors
@@ -73,57 +73,57 @@ namespace NerdDinner.Controllers
         //
         // GET: /RSVP/RsvpBegin
 
-        public ActionResult RsvpBegin(string identifier, int id)
-        {
-            Uri returnTo = new Uri(new Uri(Realm.AutoDetect), Url.Action("RsvpFinish"));
-            IAuthenticationRequest request = relyingParty.CreateRequest(identifier, Realm.AutoDetect, returnTo);
-            request.SetUntrustedCallbackArgument("DinnerId", id.ToString(CultureInfo.InvariantCulture));
-            request.AddExtension(new ClaimsRequest { Email = DemandLevel.Require, FullName = DemandLevel.Request });
-            return request.RedirectingResponse.AsActionResult();
-        }
+        //public ActionResult RsvpBegin(string identifier, int id)
+        //{
+        //    Uri returnTo = new Uri(new Uri(Realm.AutoDetect), Url.Action("RsvpFinish"));
+        //    IAuthenticationRequest request = relyingParty.CreateRequest(identifier, Realm.AutoDetect, returnTo);
+        //    request.SetUntrustedCallbackArgument("DinnerId", id.ToString(CultureInfo.InvariantCulture));
+        //    request.AddExtension(new ClaimsRequest { Email = DemandLevel.Require, FullName = DemandLevel.Request });
+        //    return request.RedirectingResponse.AsActionResult();
+        //}
 
         //
         // GET: /RSVP/RsvpBegin
         // POST: /RSVP/RsvpBegin
 
-        [AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post), ValidateInput(false)]
-        public ActionResult RsvpFinish()
-        {
-            IAuthenticationResponse response = relyingParty.GetResponse();
-            if (response == null)
-            {
-                return RedirectToAction("Index");
-            }
+        //[AcceptVerbs(HttpVerbs.Get | HttpVerbs.Post), ValidateInput(false)]
+        //public ActionResult RsvpFinish()
+        //{
+        //    IAuthenticationResponse response = relyingParty.GetResponse();
+        //    if (response == null)
+        //    {
+        //        return RedirectToAction("Index");
+        //    }
 
-            if (response.Status == AuthenticationStatus.Authenticated)
-            {
-                int id = int.Parse(response.GetUntrustedCallbackArgument("DinnerId"));
-                Dinner dinner = dinnerRepository.Find(id);
+        //    if (response.Status == AuthenticationStatus.Authenticated)
+        //    {
+        //        int id = int.Parse(response.GetUntrustedCallbackArgument("DinnerId"));
+        //        Dinner dinner = dinnerRepository.Find(id);
 
-                // The alias we're getting here is NOT a secure identifier, but a friendly one,
-                // which is all we need for this scenario.
-                string alias = response.FriendlyIdentifierForDisplay;
-                var sreg = response.GetExtension<ClaimsResponse>();
-                if (sreg != null && sreg.MailAddress != null)
-                {
-                    alias = sreg.MailAddress.User;
-                }
+        //        // The alias we're getting here is NOT a secure identifier, but a friendly one,
+        //        // which is all we need for this scenario.
+        //        string alias = response.FriendlyIdentifierForDisplay;
+        //        var sreg = response.GetExtension<ClaimsResponse>();
+        //        if (sreg != null && sreg.MailAddress != null)
+        //        {
+        //            alias = sreg.MailAddress.User;
+        //        }
 
-                // NOTE: The alias we've generated for this user isn't guaranteed to be unique.
-                // Need to trim to 30 characters because that's the max for Attendee names.
-                if (!dinner.IsUserRegistered(alias))
-                {
-                    RSVP rsvp = new RSVP();
-                    rsvp.AttendeeName = alias;
-                    rsvp.AttendeeNameId = response.ClaimedIdentifier;
+        //        // NOTE: The alias we've generated for this user isn't guaranteed to be unique.
+        //        // Need to trim to 30 characters because that's the max for Attendee names.
+        //        if (!dinner.IsUserRegistered(alias))
+        //        {
+        //            RSVP rsvp = new RSVP();
+        //            rsvp.AttendeeName = alias;
+        //            rsvp.AttendeeNameId = response.ClaimedIdentifier;
 
-                    dinner.RSVPs.Add(rsvp);
-                    dinnerRepository.SubmitChanges();
-                }
-            }
+        //            dinner.RSVPs.Add(rsvp);
+        //            dinnerRepository.SubmitChanges();
+        //        }
+        //    }
 
-            return RedirectToAction("Details", "Dinners", new { id = response.GetUntrustedCallbackArgument("DinnerId") });
-        }
+        //    return RedirectToAction("Details", "Dinners", new { id = response.GetUntrustedCallbackArgument("DinnerId") });
+        //}
 
         // GET: /RSVP/RsvpTwitterBegin
 
