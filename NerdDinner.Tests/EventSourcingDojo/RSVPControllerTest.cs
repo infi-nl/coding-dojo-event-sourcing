@@ -127,6 +127,20 @@ namespace NerdDinner.Tests.EventSourcingDojo
             AssertTextInDinnerHistoryAtIndex("scottha canceled", 1, 2);
         }
 
+        [Test]
+        public void Update_Dinner_Address_Saves_Changes() {
+            UpdateDinnerAddress("New Test Address Street 2, TestCity", asUser: "SomeUser", dinnerId: 1);
+
+            AssertDinnerAddress("New Test Address Street 2, TestCity", 1);
+        }
+
+        [Test]
+        public void DinnerHistory_Shows_Address_Changed()
+        {
+            UpdateDinnerAddress("New Test Address Street 2, TestCity", asUser: "SomeUser", dinnerId: 1);
+
+            AssertRSVPedInDinnerHistory("Address changed to: New Test Address Street 2, TestCity", 1);
+        }
 
         #region helpers
 
@@ -149,6 +163,16 @@ namespace NerdDinner.Tests.EventSourcingDojo
         private void RSVPForDinner(string userName, int dinnerId) {
             var controller = CreateRSVPControllerAs(userName);
             controller.Register(dinnerId);
+        }
+
+        private void UpdateDinnerAddress(string newAddress, string asUser, int dinnerId) {
+            var controller = CreateDinnersControllerAs(asUser);
+            controller.UpdateAddress(dinnerId, newAddress);
+        }
+
+        private void AssertDinnerAddress(string expectedAddress, int dinnerId) {
+            var dinnerDetails = GetDinnerDetails(dinnerId);
+            Assert.AreEqual(expectedAddress, dinnerDetails.Address);
         }
 
         private void AssertRSVPedInDinnerHistory(string expectedDinnerHistoryText, int dinnerId)

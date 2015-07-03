@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Authentication;
 using System.Web;
 using System.Web.Mvc;
 using NerdDinner.Helpers;
@@ -240,5 +241,25 @@ namespace NerdDinner.Controllers {
             return View("WebSlice", model.Take(5));
         }
 
+
+        public ActionResult UpdateAddress(int dinnerId, string newAddress) {
+
+            var dinner = dinnerRepository.Find(dinnerId);
+
+            if (dinner == null)
+                return View("NotFound");
+
+            try {
+                var events = dinner.ChangeAddress(newAddress, User.Identity.Name);
+                dinnerRepository.StoreEvents(events);
+
+                dinnerRepository.SubmitChanges();
+
+                return RedirectToAction("Details", new { id = dinner.DinnerID });
+            }
+            catch (AuthenticationException e) {
+                return View("InvalidOwner");
+            }
+        }
     }
 }

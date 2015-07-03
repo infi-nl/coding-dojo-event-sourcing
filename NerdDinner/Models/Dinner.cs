@@ -3,7 +3,9 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Security.Authentication;
 using System.Web.Mvc;
+using System.Web.Providers.Entities;
 using NerdDinner.Events;
 using Newtonsoft.Json;
 
@@ -145,6 +147,28 @@ namespace NerdDinner.Models
             }
         }
 
+        public ICollection<Event> ChangeAddress(string newAddress, string asUser)
+        {
+            try
+            {
+                if (!IsHostedBy(asUser)) {
+                    throw new AuthenticationException("User is not Dinner host");
+                }
+
+                var DinnerAddressChangedEvent = new AddressChanged {
+                    NewAddress = newAddress
+                };
+
+                RaiseAndApply(DinnerAddressChangedEvent);
+
+                return this._publishedEvents.ToList();
+            }
+            finally
+            {
+                this._publishedEvents.Clear();
+            }
+        }
+
         private void RaiseAndApply(IEventData eventData) {
             var @event = MakeEvent(eventData);
             RaiseEvent(@event);
@@ -180,6 +204,12 @@ namespace NerdDinner.Models
             _eventHistory.Add(String.Format("{0} {1} canceled", @event.DateTime.ToString("g"), rsvpCanceledEvent.Name));
         }
 
+        void ApplyEvent(AddressChanged addressChangedEvent, Event @event) {
+            this.Address = addressChangedEvent.NewAddress;
+
+            _eventHistory.Add(String.Format("{0} Address changed to: {1}", @event.DateTime.ToString("g"), addressChangedEvent.NewAddress));
+        }
+
         void ApplyEvent(Event e) {
             var type = Type.GetType(e.EventType);
             dynamic data = JsonConvert.DeserializeObject(e.Data, type);
@@ -204,6 +234,8 @@ namespace NerdDinner.Models
             }
             return dinners;
         }
+
+
     }
 
     public class LocationDetail
