@@ -142,6 +142,14 @@ namespace NerdDinner.Tests.EventSourcingDojo
             AssertRSVPedInDinnerHistory("Address changed to: New Test Address Street 2, TestCity", 1);
         }
 
+        [Test]
+        public void DinnerHistory_Shows_Address_Changed_With_Reason()
+        {
+            UpdateDinnerAddress("New Test Address Street 2, TestCity", asUser: "SomeUser", dinnerId: 1,reason:"New venue");
+
+            AssertRSVPedInDinnerHistory("Address changed to: New Test Address Street 2, TestCity, because of: New venue", 1);
+        }
+
         #region helpers
 
         private int CreateDinner()
@@ -165,9 +173,9 @@ namespace NerdDinner.Tests.EventSourcingDojo
             controller.Register(dinnerId);
         }
 
-        private void UpdateDinnerAddress(string newAddress, string asUser, int dinnerId) {
+        private void UpdateDinnerAddress(string newAddress, string asUser,int dinnerId,string reason = null) {
             var controller = CreateDinnersControllerAs(asUser);
-            controller.UpdateAddress(dinnerId, newAddress);
+            controller.ChangeAddress(dinnerId, newAddress,reason);
         }
 
         private void AssertDinnerAddress(string expectedAddress, int dinnerId) {

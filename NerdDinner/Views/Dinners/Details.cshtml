@@ -30,14 +30,48 @@
 			@Model.EventDate.ToShortTimeString()
 		</abbr>
 	</p>
-	<p>
-		<strong>Where:</strong> <span class="location adr"><span class="extended-address">@Model.Address</span>,
-			<span class="country-name">@Model.Country</span>
-			<abbr class="geo" title="@Model.Latitude;@Model.Longitude" style="display: none;">
-				Geolocation for hCalendar</abbr>
-		</span>
-	</p>
-	<p>
+    <p>
+        <strong>Address:</strong> 
+        <span class="location adr">
+            <span class="extended-address">@(Model.Address)</span>
+            @if (Model.IsHostedBy(User.Identity.Name)) {
+                <a href="#" class="open-extended-address-form">Change</a>
+                <form action="@Url.Action("ChangeAddress", new { id = Model.DinnerID })" class="extended-address-form" style="display: none">
+                    New address: <br/>
+                    <input type="text" name="newAddress" value="@(Model.Address)" />
+                    Why?<br/>
+                    <input type="text" name="changedReason" value="" />
+                    <input type="submit" value="Save"/>
+                    <input type="submit" id="cancel-extended-address-form" value="Cancel"/>
+                </form>
+                <script type="text/javascript">
+                    $(document).ready(function () {
+                        $(".open-extended-address-form").live('click', function () {
+                            $(this).hide();
+                            $(".extended-address").hide();
+                            $(".extended-address-form").show();
+                        });
+
+                        $("#cancel-extended-address-form").live('click', function (event) {
+                            $(".extended-address-form").hide();
+                            $(".extended-address").show();
+                            $(".open-extended-address-form").show();
+                            event.preventDefault();
+                            return false;
+                        });
+                    });
+                </script>
+            }
+            <br/>
+            <strong>Country:</strong> 
+            <span class="country-name">@Model.Country</span>
+            <abbr class="geo" title="@Model.Latitude;@Model.Longitude" style="display: none;">
+                Geolocation for hCalendar</abbr>
+        </span>
+    </p>
+    
+    
+    <p>
 		<strong>Description:</strong> <span class="description">@Model.Description</span>
 		<span style="display: none;">
 			@Html.ActionLink("URL for hCalendar", "iCal", "Services", new { id = Model.DinnerID }, new { @class = "url" })

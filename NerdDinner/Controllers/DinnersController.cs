@@ -242,15 +242,15 @@ namespace NerdDinner.Controllers {
         }
 
 
-        public ActionResult UpdateAddress(int dinnerId, string newAddress) {
+        public ActionResult ChangeAddress(int id, string newAddress, string changedReason) {
 
-            var dinner = dinnerRepository.Find(dinnerId);
+            var dinner = dinnerRepository.Find(id);
 
             if (dinner == null)
                 return View("NotFound");
 
             try {
-                var events = dinner.ChangeAddress(newAddress, User.Identity.Name);
+                var events = dinner.ChangeAddress(newAddress, User.Identity.Name, changedReason);
                 dinnerRepository.StoreEvents(events);
 
                 dinnerRepository.SubmitChanges();

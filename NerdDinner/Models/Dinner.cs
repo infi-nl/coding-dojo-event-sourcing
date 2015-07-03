@@ -147,7 +147,7 @@ namespace NerdDinner.Models
             }
         }
 
-        public ICollection<Event> ChangeAddress(string newAddress, string asUser)
+        public ICollection<Event> ChangeAddress(string newAddress, string asUser, string reason)
         {
             try
             {
@@ -156,7 +156,8 @@ namespace NerdDinner.Models
                 }
 
                 var DinnerAddressChangedEvent = new AddressChanged {
-                    NewAddress = newAddress
+                    NewAddress = newAddress,
+                    Reason = reason,
                 };
 
                 RaiseAndApply(DinnerAddressChangedEvent);
@@ -206,6 +207,11 @@ namespace NerdDinner.Models
 
         void ApplyEvent(Event<AddressChanged> @event) {
             this.Address = @event.Data.NewAddress;
+
+            if(@event.Data.Reason!=null) {
+                _eventHistory.Add(String.Format("{0} Address changed to: {1}, because of: {2}", @event.DateTime.ToString("g"), @event.Data.NewAddress, @event.Data.Reason));
+                return;
+            }
 
             _eventHistory.Add(String.Format("{0} Address changed to: {1}", @event.DateTime.ToString("g"), @event.Data.NewAddress));
         }
