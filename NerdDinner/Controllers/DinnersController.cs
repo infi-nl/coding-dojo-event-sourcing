@@ -243,23 +243,7 @@ namespace NerdDinner.Controllers {
 
         [Authorize]
         public ActionResult ChangeAddress(int id, string newAddress, string changedReason) {
-
-            var dinner = dinnerRepository.Find(id);
-
-            if (dinner == null)
-                return View("NotFound");
-
-            try {
-                var events = dinner.ChangeAddress(newAddress, User.Identity.Name, changedReason);
-                dinnerRepository.StoreEvents(events);
-
-                dinnerRepository.SubmitChanges();
-
-                return RedirectToAction("Details", new { id = dinner.DinnerID });
-            }
-            catch (AuthenticationException e) {
-                return View("InvalidOwner");
-            }
+            throw new NotImplementedException("Infi Coding Dojo TODO");
         }
     }
 }

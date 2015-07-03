@@ -97,11 +97,11 @@ namespace NerdDinner.Models
             }
         }
 
-        private readonly ICollection<string> _eventHistory = new List<string>();
+        private readonly List<string> _eventHistory = new List<string>();
         [NotMapped]
         public ICollection<string> History {
             get {
-                return this._eventHistory;
+                return this._eventHistory.AsReadOnly();
             }
         }
 
@@ -125,50 +125,6 @@ namespace NerdDinner.Models
             }
         }
 
-        public ICollection<Event> CancelRSVP(string name)
-        {
-            try
-            {
-                if (!IsUserRegistered(name)) {
-                    return new List<Event>();
-                }
-
-                var RSVPCanceledEvent = new RSVPCanceled {
-                    Name = name
-                };
-
-                RaiseAndApply(RSVPCanceledEvent);
-
-                return this._publishedEvents.ToList();
-            }
-            finally
-            {
-                this._publishedEvents.Clear();
-            }
-        }
-
-        public ICollection<Event> ChangeAddress(string newAddress, string asUser, string reason)
-        {
-            try
-            {
-                if (!IsHostedBy(asUser)) {
-                    throw new AuthenticationException("User is not Dinner host");
-                }
-
-                var DinnerAddressChangedEvent = new AddressChanged {
-                    NewAddress = newAddress,
-                    Reason = reason,
-                };
-
-                RaiseAndApply(DinnerAddressChangedEvent);
-
-                return this._publishedEvents.ToList();
-            }
-            finally
-            {
-                this._publishedEvents.Clear();
-            }
-        }
 
         private void RaiseAndApply(IEventData eventData) {
             var @event = MakeEvent(eventData);
@@ -184,7 +140,17 @@ namespace NerdDinner.Models
         }
 
         private Event MakeEvent(IEventData eventDataObject) {
-            return new Event {AggregateId = DinnerGuid, AggregateEventSequence = _currentEvent, DateTime = DateTime.UtcNow, EventType = eventDataObject.GetType().FullName, Data = JsonConvert.SerializeObject(eventDataObject)};
+            return new Event {
+                AggregateId = DinnerGuid, 
+                AggregateEventSequence = _currentEvent, 
+                DateTime = DateTime.UtcNow, 
+                EventType = eventDataObject.GetType().FullName, 
+                Data = JsonConvert.SerializeObject(eventDataObject)
+            };
+        }
+
+        void ApplyEvent(Event e) {
+            ApplyEvent(e.AddEventType());
         }
 
         void ApplyEvent(Event<RSVPed> @event) {
@@ -193,32 +159,9 @@ namespace NerdDinner.Models
             rsvp.AttendeeName = @event.Data.FriendlyName;
             rsvp.AttendeeNameId = @event.Data.Name;
             _rsvps.Add(rsvp);
-
-            _eventHistory.Add(String.Format("{0} {1} RSVPed", @event.DateTime.ToString(""), @event.Data.Name));
         }
 
-        void ApplyEvent(Event<RSVPCanceled> @event)
-        {
-            var rsvp = _rsvps.Single(r => r.AttendeeName == @event.Data.Name);
-            _rsvps.Remove(rsvp);
-
-            _eventHistory.Add(String.Format("{0} {1} canceled", @event.DateTime.ToString("g"), @event.Data.Name));
-        }
-
-        void ApplyEvent(Event<AddressChanged> @event) {
-            this.Address = @event.Data.NewAddress;
-
-            if(@event.Data.Reason!=null) {
-                _eventHistory.Add(String.Format("{0} Address changed to: {1}, because of: {2}", @event.DateTime.ToString("g"), @event.Data.NewAddress, @event.Data.Reason));
-                return;
-            }
-
-            _eventHistory.Add(String.Format("{0} Address changed to: {1}", @event.DateTime.ToString("g"), @event.Data.NewAddress));
-        }
-
-        void ApplyEvent(Event e) {
-            ApplyEvent(e.AddEventType());
-        }
+        
 
         public void Hydrate(ICollection<Event> events)
         {

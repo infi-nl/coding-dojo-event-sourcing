@@ -27,7 +27,7 @@ namespace NerdDinner.Models
 
             foreach (Dinner dinner in results)
             {
-                // TODO JB
+                // TODO Hydrate Events
                 //dinner.RSVPs = new List<RSVP>();
 
                 //var rsvps = db.RSVPs.Where(x => x.DinnerID == dinner.DinnerID);
