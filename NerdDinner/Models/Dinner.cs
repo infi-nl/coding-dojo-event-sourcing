@@ -186,34 +186,32 @@ namespace NerdDinner.Models
             return new Event {AggregateId = DinnerGuid, AggregateEventSequence = _currentEvent, DateTime = DateTime.UtcNow, EventType = eventDataObject.GetType().FullName, Data = JsonConvert.SerializeObject(eventDataObject)};
         }
 
-        void ApplyEvent(RSVPed rsvpedEvent, Event @event) {
+        void ApplyEvent(Event<RSVPed> @event) {
             var rsvp = new RSVP();
             rsvp.DinnerID = this.DinnerID;
-            rsvp.AttendeeName = rsvpedEvent.FriendlyName;
-            rsvp.AttendeeNameId = rsvpedEvent.Name;
+            rsvp.AttendeeName = @event.Data.FriendlyName;
+            rsvp.AttendeeNameId = @event.Data.Name;
             _rsvps.Add(rsvp);
 
-            _eventHistory.Add(String.Format("{0} {1} RSVPed", @event.DateTime.ToString(""), rsvpedEvent.Name));
+            _eventHistory.Add(String.Format("{0} {1} RSVPed", @event.DateTime.ToString(""), @event.Data.Name));
         }
 
-        void ApplyEvent(RSVPCanceled rsvpCanceledEvent, Event @event)
+        void ApplyEvent(Event<RSVPCanceled> @event)
         {
-            var rsvp = _rsvps.Single(r => r.AttendeeName == rsvpCanceledEvent.Name);
+            var rsvp = _rsvps.Single(r => r.AttendeeName == @event.Data.Name);
             _rsvps.Remove(rsvp);
 
-            _eventHistory.Add(String.Format("{0} {1} canceled", @event.DateTime.ToString("g"), rsvpCanceledEvent.Name));
+            _eventHistory.Add(String.Format("{0} {1} canceled", @event.DateTime.ToString("g"), @event.Data.Name));
         }
 
-        void ApplyEvent(AddressChanged addressChangedEvent, Event @event) {
-            this.Address = addressChangedEvent.NewAddress;
+        void ApplyEvent(Event<AddressChanged> @event) {
+            this.Address = @event.Data.NewAddress;
 
-            _eventHistory.Add(String.Format("{0} Address changed to: {1}", @event.DateTime.ToString("g"), addressChangedEvent.NewAddress));
+            _eventHistory.Add(String.Format("{0} Address changed to: {1}", @event.DateTime.ToString("g"), @event.Data.NewAddress));
         }
 
         void ApplyEvent(Event e) {
-            var type = Type.GetType(e.EventType);
-            dynamic data = JsonConvert.DeserializeObject(e.Data, type);
-            ((dynamic)this).ApplyEvent(data, e);
+            ApplyEvent(e.AddEventType());
         }
 
         public void Hydrate(ICollection<Event> events)
