@@ -4,7 +4,9 @@ using System.Linq;
 using System.Text;
 using System.Web.Mvc;
 using System.Web.Routing;
+using NerdDinner.Controllers;
 using NerdDinner.Models;
+using Newtonsoft.Json;
 using NUnit.Framework;
 
 namespace NerdDinner.Tests.CodingDojo
@@ -89,6 +91,15 @@ namespace NerdDinner.Tests.CodingDojo
             Assert.AreEqual(expectedCount, actualRSVPCount, "RSVP count not valid");
         }
 
+        private void AssertRSVPCountInPopularDinnersList(string userName, int dinnerId, int expectedCount) {
+            var popularDinners = GetPopularDinners(userName);
+
+            var dinner = popularDinners.SingleOrDefault(d => d.DinnerID == dinnerId);
+
+            Assert.IsNotNull(dinner, "Dinner not found in popuplar dinners");
+            Assert.AreEqual(expectedCount, dinner.RSVPCount, "RSVP count does not match expected count");
+        }
+
         private Dinner GetDinnerDetails(int dinnerId)
         {
             var dinnerController = CreateDinnersControllerAs("scotthb");
@@ -104,6 +115,14 @@ namespace NerdDinner.Tests.CodingDojo
 
             return GetViewModel<IEnumerable<Dinner>>(dinnerResult).ToList();
         }
+
+        private ICollection<JsonDinner> GetPopularDinners(string userName) {
+            var searchController = CreateSearchControllerAs(userName);
+
+            var result = searchController.GetMostPopularDinners(1000);
+
+            return GetDataFromJsonResult<ICollection<JsonDinner>>(result);
+        } 
 
 
         public RouteValueDictionary GetRedirectResultRouteValues(ActionResult result)
@@ -122,6 +141,15 @@ namespace NerdDinner.Tests.CodingDojo
 
             Assert.IsInstanceOf<T>(viewResult.Model);
             return (T)viewResult.Model;
+        }
+
+        public T GetDataFromJsonResult<T>(ActionResult result) where T : class
+        {
+            Assert.IsInstanceOf<JsonResult>(result);
+            var viewResult = result as JsonResult;
+
+            Assert.IsInstanceOf<T>(viewResult.Data);
+            return (T)viewResult.Data;
         }
 
     }

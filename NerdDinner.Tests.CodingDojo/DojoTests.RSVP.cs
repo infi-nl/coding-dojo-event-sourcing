@@ -66,5 +66,13 @@ namespace NerdDinner.Tests.CodingDojo
 
             AssertDinnerInMyDinners("scottha", 1);
         }
+
+        [Test]
+        public void RSVP_Count_Shows_In_Popular_Dinners_List()
+        {
+            RSVPForDinner("scottha", 1);
+
+            AssertRSVPCountInPopularDinnersList("scottha", 1, expectedCount: 2);
+        }
     }
 }

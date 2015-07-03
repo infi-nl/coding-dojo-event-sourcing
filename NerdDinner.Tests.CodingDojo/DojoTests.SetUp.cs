@@ -69,5 +69,16 @@ namespace NerdDinner.Tests.CodingDojo
             return controller;
         }
 
+        SearchController CreateSearchControllerAs(string userName) {
+            var mock = new Mock<ControllerContext>();
+            var nerdIdentity = FakeIdentity.CreateIdentity(userName);
+            mock.SetupGet(p => p.HttpContext.User.Identity).Returns(nerdIdentity);
+
+            var controller = new SearchController(new DinnerRepository(new NerdDinners()));
+            controller.ControllerContext = mock.Object;
+
+            return controller;
+        }
+
     }
 }
