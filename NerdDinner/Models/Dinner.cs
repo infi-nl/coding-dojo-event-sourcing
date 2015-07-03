@@ -116,6 +116,30 @@ namespace NerdDinner.Models
             }
         }
 
+        public ICollection<Event> CancelRSVP(string name)
+        {
+            try
+            {
+                if (!IsUserRegistered(name)) {
+                    return new List<Event>();
+                }
+
+                var RSVPCanceledEvent = new RSVPCanceled {
+                    Name = name
+                };
+
+                RaiseEvent(RSVPCanceledEvent);
+                ApplyEvent(RSVPCanceledEvent);
+
+                return this._publishedEvents.ToList();
+            }
+            finally
+            {
+                this._publishedEvents.Clear();
+            }
+        }
+
+
         private readonly List<Event> _publishedEvents = new List<Event>();
 
 
@@ -132,6 +156,12 @@ namespace NerdDinner.Models
             _rsvps.Add(rsvp);
         }
 
+        void ApplyEvent(RSVPCanceled rsvpCanceledEvent)
+        {
+            var rsvp = _rsvps.Single(r => r.AttendeeName == rsvpCanceledEvent.Name);
+            _rsvps.Remove(rsvp);
+        }
+
         public void Hydrate(ICollection<Event> events)
         {
             foreach (var e in events.Where(e => e.AggregateEventSequence >= _currentEvent).OrderBy(e => e.AggregateEventSequence))
@@ -145,6 +175,8 @@ namespace NerdDinner.Models
                 _currentEvent++;
             }
         }
+
+        
     }
 
     public class LocationDetail

@@ -51,17 +51,18 @@ namespace NerdDinner.Controllers
         [Authorize, HttpPost]
         public ActionResult Cancel(int id)
         {
-            throw new NotImplementedException("Dojo ftw");
-            //Dinner dinner = dinnerRepository.Find(id);
 
-            //RSVP rsvp = dinner.RSVPs.SingleOrDefault(r => this.User.Identity.Name == (r.AttendeeNameId ?? r.AttendeeName));
-            //if (rsvp != null)
-            //{
-            //    dinnerRepository.DeleteRsvp(rsvp);
-            //    dinnerRepository.SubmitChanges();
-            //}
+            Dinner dinner = dinnerRepository.Find(id);
 
-            //return Content("Sorry you can't make it!");
+            NerdIdentity nerd = (NerdIdentity)User.Identity;
+
+            var publishedEvents = dinner.CancelRSVP(nerd.Name);
+
+            dinnerRepository.StoreEvents(publishedEvents);
+
+            dinnerRepository.SubmitChanges();
+
+            return Content("Sorry you can't make it!");
         }
 
         

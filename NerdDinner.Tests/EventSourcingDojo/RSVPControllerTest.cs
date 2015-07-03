@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
-using System.Security.Principal;
 using System.Web.Mvc;
 using System.Web.Routing;
 using Moq;
@@ -26,10 +25,8 @@ namespace NerdDinner.Tests.EventSourcingDojo
         [Test]
         public void CreateDinner_Twice_Should_Work()
         {
-            var dinnerID1 = CreateDinner();
-            var dinnerID2 = CreateDinner();
-
-
+            CreateDinner();
+            CreateDinner();
         }
 
         [Test]
@@ -66,6 +63,35 @@ namespace NerdDinner.Tests.EventSourcingDojo
             AssertRSVPedForDinnerCount("scottha", 2, expectedCount: 0);
         }
 
+        [Test]
+        public void Cancel_RSVP_Should_Remove_User_From_RSVP_List() {
+            RSVPForDinner("scottha", 1);
+
+            CancelRSVP("scottha", 1);
+
+            AssertRSVPedForDinnerCount("scottha", 1, expectedCount: 0);
+        }
+
+        [Test]
+        public void Cancel_RSVP_Should_Be_Idempotent()
+        {
+            RSVPForDinner("scottha", 1);
+
+            CancelRSVP("scottha", 1);
+            CancelRSVP("scottha", 1);
+
+            AssertRSVPedForDinnerCount("scottha", 1, expectedCount: 0);
+        }
+
+        [Test]
+        public void Cancel_RSVP_For_Not_RSVPed_User_Should_Work()
+        {
+            AssertRSVPedForDinnerCount("scottha", 1, expectedCount: 0);
+
+            CancelRSVP("scottha", 1);
+        }
+
+        #region helpers
 
         private int CreateDinner()
         {
@@ -77,6 +103,11 @@ namespace NerdDinner.Tests.EventSourcingDojo
             return (int)GetRedirectResultRouteValues(result)["id"];
         }
 
+        private void CancelRSVP(string userName, int dinnerId)
+        {
+            var controller = CreateRSVPControllerAs(userName);
+            controller.Cancel(dinnerId);
+        }
 
         private void RSVPForDinner(string userName, int dinnerId) {
             var controller = CreateRSVPControllerAs(userName);
@@ -126,14 +157,14 @@ namespace NerdDinner.Tests.EventSourcingDojo
             return (T)viewResult.Model;
         }
 
+#endregion
+
         #region setup
 
         [SetUp]
         public void SetUp() {
             InitializeLocalDbWithTestData();
         }
-
-        
 
         private static void InitializeLocalDbWithTestData() {
             Database.SetInitializer<NerdDinners>(null);
