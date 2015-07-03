@@ -10,6 +10,6 @@ namespace NerdDinner.Models {
         IQueryable<Dinner> FindDinnersByText(string q);
         
 
-        void StoreEventsForDinner(Dinner dinner);
+        void StoreEvents(ICollection<Event> events); // TODO naar eventrepository?
     }
 }

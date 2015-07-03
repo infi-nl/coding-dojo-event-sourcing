@@ -11,7 +11,15 @@ namespace NerdDinner.Models
 {
     public class DinnerRepository : IDinnerRepository
     {
-        private readonly INerdDinners db = DependencyResolver.Current.GetService<INerdDinners>();
+        private readonly NerdDinners db;
+
+        public DinnerRepository() {
+            this.db = DependencyResolver.Current.GetService<INerdDinners>() as NerdDinners;
+        }
+
+        public DinnerRepository(NerdDinners db) {
+            this.db = db;
+        }
 
         public IQueryable<Dinner> FindByLocation(float latitude, float longitude)
         {
@@ -51,7 +59,7 @@ namespace NerdDinner.Models
 
         public IQueryable<Dinner> All
         {
-            get { return db.Dinners.Include(r => r.RSVPs); }
+            get { return db.Dinners; }
         }
 
         public Dinner Find(int id)
@@ -90,15 +98,11 @@ namespace NerdDinner.Models
             db.Dinners.Remove(dinner);
         }
 
-        public void StoreEventsForDinner(Dinner dinner) {
-            foreach (var publishedEvent in dinner.PublishedEvents) {
-                var e = new Event();
-                e.AggregateId = dinner.DinnerGuid;
-                e.Data        = JsonConvert.SerializeObject(publishedEvent);
-                e.DateTime    = DateTime.UtcNow;
-
-                db.Events.Add(e);
+        public void StoreEvents(ICollection<Event> events) {
+            foreach (var publishedEvent in events) {
+                db.Events.Add(publishedEvent);
             }
+            
         }
 
         //private List<RSVP> GetRSVP

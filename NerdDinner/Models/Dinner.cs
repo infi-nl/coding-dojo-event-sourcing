@@ -56,7 +56,11 @@ namespace NerdDinner.Models
         [HiddenInput(DisplayValue = false)]
         public string HostedById { get; set; }
 
+        private int _currentEvent = 0;
+
         private List<RSVP> _rsvps = new List<RSVP>();
+
+        [NotMapped]
         public ICollection<RSVP> RSVPs {
             get {
                 return _rsvps.AsReadOnly();
@@ -91,33 +95,33 @@ namespace NerdDinner.Models
             }
         }
 
-        public void RSVP(string name, string friendlyName) {
-            if (IsUserRegistered(name)) {
-                return;
+        public ICollection<Event> RSVP(string name, string friendlyName) {
+            try {
+                if (IsUserRegistered(name)) {
+                    return new List<Event>();
+                }
+
+                var RSVPedEvent = new RSVPed {
+                    Name = name,
+                    FriendlyName = friendlyName
+                };
+
+                RaiseEvent(RSVPedEvent);
+                ApplyEvent(RSVPedEvent);
+
+                return this._publishedEvents.ToList();
             }
-
-            RaiseEvent(new RSVPed {
-                Name = name,
-                FriendlyName = friendlyName
-            });
-
-            //RSVP rsvp = new RSVP();
-
-            //rsvp.AttendeeNameId = name;
-            //rsvp.AttendeeName = friendlyName;
-
-            //RSVPs.Add(rsvp);
+            finally {
+                this._publishedEvents.Clear();
+            }
         }
 
-        private readonly List<object> _publishedEvents = new List<object>();
-        public ICollection<Event> PublishedEvents { // TODO JB make read only
-            get {
-                return this._publishedEvents.Select(pe => new Event { AggregateId = DinnerGuid, DateTime = DateTime.UtcNow, EventType = pe.GetType().FullName, Data = JsonConvert.SerializeObject(pe) }).ToList();
-            }
-        } 
+        private readonly List<Event> _publishedEvents = new List<Event>();
 
-        private void RaiseEvent(object eventObject) {
-            _publishedEvents.Add(eventObject);
+
+        private void RaiseEvent(IEvent eventObject) {
+            _publishedEvents.Add(new Event { AggregateId = DinnerGuid, AggregateEventSequence = _currentEvent, DateTime = DateTime.UtcNow, EventType = eventObject.GetType().FullName, Data = JsonConvert.SerializeObject(eventObject) });
+            _currentEvent++;
         }
 
         void ApplyEvent(RSVPed rsvpedEvent) {
@@ -130,11 +134,15 @@ namespace NerdDinner.Models
 
         public void Hydrate(ICollection<Event> events)
         {
-            foreach (var e in events)
-            { // TODO JB order events
+            foreach (var e in events.Where(e => e.AggregateEventSequence >= _currentEvent).OrderBy(e => e.AggregateEventSequence))
+            { 
+                if (e.AggregateEventSequence != _currentEvent) {
+                    throw new Exception("Unexpected event sequence");
+                }
                 var type = Type.GetType(e.EventType);
                 dynamic data = JsonConvert.DeserializeObject(e.Data, type);
                 ((dynamic)this).ApplyEvent(data);
+                _currentEvent++;
             }
         }
     }

@@ -23,8 +23,8 @@ namespace NerdDinner.Tests.Fakes
         {            
         }
 
-        public void StoreEventsForDinner(Dinner dinner) {
-            events.AddRange(dinner.PublishedEvents);
+        public void StoreEvents(ICollection<Event> eventCollection) {
+            events.AddRange(eventCollection);
         }
 
         public IQueryable<Dinner> FindByLocation(float latitude, float longitude)

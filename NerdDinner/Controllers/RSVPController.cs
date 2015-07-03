@@ -35,9 +35,9 @@ namespace NerdDinner.Controllers
 
             NerdIdentity nerd = (NerdIdentity)User.Identity;
 
-            dinner.RSVP(nerd.Name, nerd.FriendlyName);
+            var publishedEvents = dinner.RSVP(nerd.Name, nerd.FriendlyName);
 
-            dinnerRepository.StoreEventsForDinner(dinner);
+            dinnerRepository.StoreEvents(publishedEvents);
 
             dinnerRepository.SubmitChanges();
             

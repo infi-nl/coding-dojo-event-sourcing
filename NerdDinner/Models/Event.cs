@@ -11,5 +11,6 @@ namespace NerdDinner.Models
         public string EventType { get; set; }
 
         public DateTimeOffset DateTime    { get; set; }
+        public int AggregateEventSequence { get; set; }
     }  
 }
