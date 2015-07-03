@@ -5,7 +5,7 @@ using System.Text;
 
 namespace NerdDinner.Events
 {
-    public interface IEvent {
+    public interface IEventData {
 
     }
 }

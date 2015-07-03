@@ -99,6 +99,35 @@ namespace NerdDinner.Tests.EventSourcingDojo
             AssertDinnerInMyDinners("scottha", 1);
         }
 
+        [Test]
+        public void DinnerHistory_Shows_RSVPed() {
+            RSVPForDinner("scottha", 1);
+
+            AssertRSVPedInDinnerHistory("scottha RSVPed", 1);
+        }
+
+        [Test]
+        public void DinnerHistory_Shows_Canceled()
+        {
+            RSVPForDinner("scottha", 1);
+
+            CancelRSVP("scottha", 1);
+
+            AssertRSVPedInDinnerHistory("scottha canceled", 1);
+        }
+
+        [Test]
+        public void DinnerHistory_Shows_RSVPed_First_Then_Canceled()
+        {
+            RSVPForDinner("scottha", 1);
+
+            CancelRSVP("scottha", 1);
+
+            AssertTextInDinnerHistoryAtIndex("scottha RSVPed", 1, 1); // Event '0' = Dinner host RSVPed
+            AssertTextInDinnerHistoryAtIndex("scottha canceled", 1, 2);
+        }
+
+
         #region helpers
 
         private int CreateDinner()
@@ -121,6 +150,22 @@ namespace NerdDinner.Tests.EventSourcingDojo
             var controller = CreateRSVPControllerAs(userName);
             controller.Register(dinnerId);
         }
+
+        private void AssertRSVPedInDinnerHistory(string expectedDinnerHistoryText, int dinnerId)
+        {
+            var dinnerDetails = GetDinnerDetails(dinnerId);
+
+            Assert.IsTrue(dinnerDetails.History.Any(h => h.EndsWith(expectedDinnerHistoryText)), "DinnerHistory text '{0}' not found", expectedDinnerHistoryText);
+        }
+
+        private void AssertTextInDinnerHistoryAtIndex(string expectedDinnerHistoryText, int dinnerId, int index)
+        {
+            var dinnerDetails = GetDinnerDetails(dinnerId);
+
+            Assert.IsTrue(dinnerDetails.History.Count() > index, "DinnerHistory does not contain enough entries");
+            Assert.IsTrue(dinnerDetails.History.ElementAt(index).EndsWith(expectedDinnerHistoryText), "DinnerHistory text '{0}' not found at index {1}", expectedDinnerHistoryText, index);
+        }
+
 
         private void AssertDinnerInMyDinners(string userName, int dinnerId)
         {

@@ -68,6 +68,17 @@
 			</ul>
 		</div>
 	}
+    @if (Model.History.Any())
+	{
+        <div id="history">
+            <strong>History</strong>
+            <ul class="activity-feed">
+                @foreach (var activity in Model.History) { 
+                    <li class="activity">@activity</li>
+                }
+            </ul>
+        </div>
+	}
 	@Html.Partial("_EditAndDeleteLinks")
 </div>
 <div id="mapDiv">

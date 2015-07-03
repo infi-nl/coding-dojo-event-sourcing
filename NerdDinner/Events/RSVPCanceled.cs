@@ -1,6 +1,6 @@
 ﻿namespace NerdDinner.Events
 {
-    public class RSVPCanceled : IEvent
+    public class RSVPCanceled : IEventData
     {
         public string Name { get; set; }
     }
