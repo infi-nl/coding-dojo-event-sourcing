@@ -241,7 +241,7 @@ namespace NerdDinner.Controllers {
             return View("WebSlice", model.Take(5));
         }
 
-
+        [Authorize]
         public ActionResult ChangeAddress(int id, string newAddress, string changedReason) {
 
             var dinner = dinnerRepository.Find(id);
