@@ -54,6 +54,11 @@ namespace NerdDinner.Tests.Fakes
             get { return context.AsQueryable(); }
         }
 
+        public IQueryable<Event> AllEvents
+        {
+            get { return events.AsQueryable(); }
+        }
+
         public IQueryable<Dinner> AllIncluding(params System.Linq.Expressions.Expression<Func<Dinner, object>>[] includeProperties)
         {
             IQueryable<Dinner> query = All;

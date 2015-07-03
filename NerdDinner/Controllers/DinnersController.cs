@@ -205,7 +205,9 @@ namespace NerdDinner.Controllers {
         {
             _nerdIdentity = this.nerdIdentity;
 
-            var userDinners = from dinner in dinnerRepository.All
+            
+
+            var userDinners = from dinner in Dinner.HydrateAll(dinnerRepository.All.ToList(), dinnerRepository.AllEvents.ToList())
                               where
                                 (
                                 String.Equals((dinner.HostedById ?? dinner.HostedBy), _nerdIdentity.Name)

@@ -176,7 +176,12 @@ namespace NerdDinner.Models
             }
         }
 
-        
+        public static ICollection<Dinner> HydrateAll(List<Dinner> dinners, List<Event> events) {
+            foreach (var dinner in dinners) {
+                dinner.Hydrate(events.Where(e => e.AggregateId == dinner.DinnerGuid).ToList());
+            }
+            return dinners;
+        }
     }
 
     public class LocationDetail

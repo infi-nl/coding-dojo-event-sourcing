@@ -105,6 +105,12 @@ namespace NerdDinner.Models
             
         }
 
+        public IQueryable<Event> AllEvents {
+            get {
+                return db.Events;
+            }
+        }
+
         //private List<RSVP> GetRSVP
 
         //

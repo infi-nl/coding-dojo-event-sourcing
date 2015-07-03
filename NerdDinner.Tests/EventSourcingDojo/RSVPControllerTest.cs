@@ -91,6 +91,14 @@ namespace NerdDinner.Tests.EventSourcingDojo
             CancelRSVP("scottha", 1);
         }
 
+
+        [Test]
+        public void When_RSVPed_Dinner_Shows_In_MyDinners() {
+            RSVPForDinner("scottha", 1);
+
+            AssertDinnerInMyDinners("scottha", 1);
+        }
+
         #region helpers
 
         private int CreateDinner()
@@ -112,6 +120,16 @@ namespace NerdDinner.Tests.EventSourcingDojo
         private void RSVPForDinner(string userName, int dinnerId) {
             var controller = CreateRSVPControllerAs(userName);
             controller.Register(dinnerId);
+        }
+
+        private void AssertDinnerInMyDinners(string userName, int dinnerId)
+        {
+            var myDinners = GetMyDinners(userName);
+
+            var actualDinner = myDinners.SingleOrDefault(d => d.DinnerID == dinnerId);
+
+            Assert.IsNotNull(actualDinner, "Dinner in MyDinners for User {0} not found", userName);
+        
         }
 
         private void AssertRSVPedForDinner(string userName, int dinnerId)
@@ -139,6 +157,15 @@ namespace NerdDinner.Tests.EventSourcingDojo
 
             return GetViewModel<Dinner>(dinnerResult);
         }
+
+        private ICollection<Dinner> GetMyDinners(string userName)
+        {
+            var dinnerController = CreateDinnersControllerAs(userName);
+            var dinnerResult = dinnerController.My();
+
+            return GetViewModel<IEnumerable<Dinner>>(dinnerResult).ToList();
+        }
+
 
         public RouteValueDictionary GetRedirectResultRouteValues(ActionResult result) 
         {

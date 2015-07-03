@@ -11,5 +11,6 @@ namespace NerdDinner.Models {
         
 
         void StoreEvents(ICollection<Event> events); // TODO naar eventrepository?
+        IQueryable<Event> AllEvents { get; }
     }
 }
