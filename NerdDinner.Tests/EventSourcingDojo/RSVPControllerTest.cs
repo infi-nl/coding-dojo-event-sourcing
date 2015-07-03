@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Data.Entity;
 using System.Linq;
 using System.Security.Principal;
 using System.Web.Mvc;
+using System.Web.Routing;
 using Moq;
 using NerdDinner.Controllers;
 using NerdDinner.Models;
@@ -13,6 +15,22 @@ namespace NerdDinner.Tests.EventSourcingDojo
 {
     [TestFixture]
     public class RSVPControllerTest {
+
+        [Test]
+        public void CreateDinner_Should_Add_Host_As_RSVP() {
+            var dinnerID = CreateDinner();
+
+            AssertRSVPedForDinner("scottha", dinnerID);
+        }
+
+        [Test]
+        public void CreateDinner_Twice_Should_Work()
+        {
+            var dinnerID1 = CreateDinner();
+            var dinnerID2 = CreateDinner();
+
+
+        }
 
         [Test]
         public void RegisterAction_Should_Connect_User_To_Dinner() {
@@ -49,6 +67,17 @@ namespace NerdDinner.Tests.EventSourcingDojo
         }
 
 
+        private int CreateDinner()
+        {
+            var testDinner = new Dinner { Title = "TestDinner", EventDate = new DateTime(2016, 1, 1), Description = "TestDinner Description", HostedBy = "scottha", HostedById = "scottha", ContactPhone = "0123456789", Address = "TestDinner Address", Country = "Europe" };
+
+            var controller = CreateDinnersControllerAs("scottha");
+            var result = controller.Create(testDinner);
+
+            return (int)GetRedirectResultRouteValues(result)["id"];
+        }
+
+
         private void RSVPForDinner(string userName, int dinnerId) {
             var controller = CreateRSVPControllerAs(userName);
             controller.Register(dinnerId);
@@ -80,6 +109,15 @@ namespace NerdDinner.Tests.EventSourcingDojo
             return GetViewModel<Dinner>(dinnerResult);
         }
 
+        public RouteValueDictionary GetRedirectResultRouteValues(ActionResult result) 
+        {
+            Assert.IsInstanceOf<RedirectToRouteResult>(result);
+            var redirectToRouteResult = result as RedirectToRouteResult;
+
+            Assert.IsNotNull(redirectToRouteResult);
+            return redirectToRouteResult.RouteValues;
+        }
+
         public T GetViewModel<T>(ActionResult result) where T : class{
             Assert.IsInstanceOf<ViewResult>(result);
             var viewResult = result as ViewResult;
@@ -93,13 +131,13 @@ namespace NerdDinner.Tests.EventSourcingDojo
         [SetUp]
         public void SetUp() {
             InitializeLocalDbWithTestData();
-
-            this.testDinnerRepository = new DinnerRepository(new NerdDinners());
         }
 
         
 
         private static void InitializeLocalDbWithTestData() {
+            Database.SetInitializer<NerdDinners>(null);
+
             var dbContext = new NerdDinners();
             dbContext.Database.CreateIfNotExists();
             dbContext.Database.ExecuteSqlCommand("TRUNCATE TABLE [Dinners]");
@@ -123,7 +161,7 @@ namespace NerdDinner.Tests.EventSourcingDojo
             var nerdIdentity = FakeIdentity.CreateIdentity(userName);
             mock.SetupGet(p => p.HttpContext.User.Identity).Returns(nerdIdentity);
 
-            var controller = new RSVPController(testDinnerRepository);
+            var controller = new RSVPController(new DinnerRepository(new NerdDinners()));
             controller.ControllerContext = mock.Object;
 
             return controller;
@@ -136,14 +174,13 @@ namespace NerdDinner.Tests.EventSourcingDojo
             var nerdIdentity = FakeIdentity.CreateIdentity(userName);
             mock.SetupGet(p => p.HttpContext.User.Identity).Returns(nerdIdentity);
 
-            var controller = new DinnersController(testDinnerRepository, nerdIdentity);
+            var controller = new DinnersController(new DinnerRepository(new NerdDinners()), nerdIdentity);
             controller.ControllerContext = mock.Object;
 
             return controller;
         }
 
 
-        IDinnerRepository testDinnerRepository;
 
         #endregion
 

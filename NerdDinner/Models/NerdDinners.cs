@@ -20,9 +20,7 @@ namespace NerdDinner.Models
     {
         public NerdDinners() 
         {
-            Configuration.LazyLoadingEnabled = false;
-
-            Database.SetInitializer<NerdDinners>(null);
+            Configuration.LazyLoadingEnabled = false;  
         }
 
         public DbSet<Dinner> Dinners { get; set; }

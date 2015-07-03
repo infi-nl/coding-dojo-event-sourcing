@@ -133,8 +133,10 @@ namespace NerdDinner.Controllers {
             if (ModelState.IsValid) {
                 dinner.HostedById = this.nerdIdentity.Name;
                 dinner.HostedBy = this.nerdIdentity.FriendlyName;
+                dinner.DinnerGuid = Guid.NewGuid();
 
-                dinner.RSVP(this.nerdIdentity.Name, this.nerdIdentity.FriendlyName);
+                var events = dinner.RSVP(this.nerdIdentity.Name, this.nerdIdentity.FriendlyName);
+                dinnerRepository.StoreEvents(events);
  
                 dinnerRepository.InsertOrUpdate(dinner);
                 dinnerRepository.SubmitChanges();
