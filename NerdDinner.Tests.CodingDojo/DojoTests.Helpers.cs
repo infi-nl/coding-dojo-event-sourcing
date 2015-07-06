@@ -8,6 +8,7 @@ using NerdDinner.Controllers;
 using NerdDinner.Models;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using NerdDinner.Events;
 
 namespace NerdDinner.Tests.CodingDojo
 {
@@ -152,6 +153,14 @@ namespace NerdDinner.Tests.CodingDojo
             return (T)viewResult.Data;
         }
 
-    }
+        void AssertEventPublished<T>(Action<Event<T>> assertOn) where T : IEventData{
+			var e = _publishedEvents.FirstOrDefault(p=>p.EventType == typeof(T).FullName);
 
+			Assert.NotNull(e, "event not published");
+
+			dynamic strongEvent = e.AddEventType();
+
+			assertOn((Event<T>)strongEvent);
+		}
+    }
 }

@@ -99,9 +99,7 @@ namespace NerdDinner.Models
         }
 
         public void StoreEvents(ICollection<Event> events) {
-            foreach (var publishedEvent in events) {
-                db.Events.Add(publishedEvent);
-            }
+            db.StoreEvents(events);
             
         }
 

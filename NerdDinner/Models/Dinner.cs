@@ -113,7 +113,8 @@ namespace NerdDinner.Models
 
                 var RSVPedEvent = new RSVPed {
                     Name = name,
-                    FriendlyName = friendlyName
+                    FriendlyName = friendlyName,
+                    DinnerId = DinnerID
                 };
 
                 RaiseAndApply(RSVPedEvent);

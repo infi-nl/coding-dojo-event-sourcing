@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using NUnit.Framework;
+using NerdDinner.Events;
 
 namespace NerdDinner.Tests.CodingDojo
 {
@@ -74,5 +75,17 @@ namespace NerdDinner.Tests.CodingDojo
 
             AssertRSVPCountInPopularDinnersList("scottha", 1, expectedCount: 2);
         }
+
+        [Test]
+        public void An_RSVPed_Event_Is_Published_When_RSVPing() {
+            RSVPForDinner("freek", 1);
+
+			AssertEventPublished<RSVPed>(e=> {
+				Assert.AreEqual("freek", e.Data.FriendlyName, "Username not correct in event");
+				Assert.AreEqual(1, e.Data.DinnerId, "DinnerId not correct in event");
+			});
+        }
+
+		
     }
 }
