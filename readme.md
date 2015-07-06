@@ -1,0 +1,26 @@
+#Infi Coding Dojo - Event Sourcing
+
+This is the codebase used for our [Coding Dojo](http://code.joejag.com/2009/the-coding-dojo.html) session on [Event Sourcing](https://msdn.microsoft.com/en-us/library/jj591559.aspx) (scheduled for July 7th, 2015). The code consists a stripped down version of the [NerdDinner](http://www.nerddinner.com) application, with a basic Event Sourcing set-up already implemented.
+
+The main functionality of the (stripped down) NerdDinner application is the ability to host and find dinners, as well as RSVP to specific dinners. Initially, the flow for a user to RSVP to a dinner has been implemented using Event Sourcing techniques. Furthermore, a set of unit tests has been created to cover the basic use cases for the RSVP funciontality, as well as additional tests that are expected to cover new functionality added during the Coding Dojo.
+
+### Initial set-up ###
+
+In our implementation based on Event Sourcing, specific actions trigger events that are stored in a general *Event* table in the database. This table contains the general properties of the events, as well as serialized data (JSON) for that specific event type. In the initial implementation only the *RSVPed* event exists, which contains the name of the user that has registered for the specific dinner identified by the event's *AggregateId* field. The dinner itself is identified by the *AggregateId* property of the event. This allows the system to easily retrieve all the events for a specific dinner (the aggregate in this case). When loading the dinner from the database, we can re-apply ('hydrate') all the known events for that dinner in order to obtain its current state. 
+
+### Assignments
+
+During the Coding Dojo the participants are expected to expand the application by implementing new features of modifying existing features. Listed below (in suggested order) are the requested changes to the application:
+
+1.  Implement canceling an RSVP
+2.  Show a history of events (activity feed) on the dinner detail page
+3.  Implement changing a dinner's address (using Event Sourcing)
+    - A UI implementation already exists in /Views/Dinners/Detail.cshtml (remove '&& false' from the if statement)
+
+Basic unit tests for these assignments already exist (and are expected to fail initially, until these features are implemented). Some tests expect specific text values, so these may be changed if needed.
+
+##### Additional assingment
+
+If there is enough time, you can attempt to optimize the hydrating of events when performing specific queries. A good example of this can be found in SearchController.GetMostPopularDinners(), which has to retrieve all dinners and all events from the database before hydrating the events to the corresponding dinners (in-memory), before actually filtering and selecting the dinners that are most popular. Obviously, this can be improved dramatically if the query could be done in the database instead of in-memory. 
+
+A possible solution to this would be to create a specific database tables that specializes on this specific query. This table would have to be filled or updated everytime a new event is applied to the system (for example, by using hooks). Other approaches may also be possible, so feel free to experiment. It may be useful to read up more on *CQRS* and more specifically *Read Models*.
