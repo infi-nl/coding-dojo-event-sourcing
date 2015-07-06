@@ -4,6 +4,10 @@ This is the codebase used for our [Coding Dojo](http://code.joejag.com/2009/the-
 
 The main functionality of the (stripped down) NerdDinner application is the ability to host and find dinners, as well as RSVP to specific dinners. Initially, the flow for a user to RSVP to a dinner has been implemented using Event Sourcing techniques. Furthermore, a set of unit tests has been created to cover the basic use cases for the RSVP funciontality, as well as additional tests that are expected to cover new functionality added during the Coding Dojo.
 
+### Requirements
+
+In order to run this application you need Visual Studio (tested on version 2012) as well as [SQL Server](http://www.hanselman.com/blog/DownloadSQLServerExpress.aspx) (tested on version 2012). Simply build the solution and run the tests. You can also run the application and see if registering a user and hosting a dinner works properly. If any issues occur here, please let us know.
+
 ### Initial set-up ###
 
 In our implementation based on Event Sourcing, specific actions trigger events that are stored in a general *Event* table in the database. This table contains the general properties of the events, as well as serialized data (JSON) for that specific event type. In the initial implementation only the *RSVPed* event exists, which contains the name of the user that has registered for the specific dinner identified by the event's *AggregateId* field. The dinner itself is identified by the *AggregateId* property of the event. This allows the system to easily retrieve all the events for a specific dinner (the aggregate in this case). When loading the dinner from the database, we can re-apply ('hydrate') all the known events for that dinner in order to obtain its current state. 
