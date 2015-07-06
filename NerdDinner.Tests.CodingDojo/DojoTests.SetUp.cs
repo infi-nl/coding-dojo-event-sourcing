@@ -23,10 +23,9 @@ namespace NerdDinner.Tests.CodingDojo
 
         private static void InitializeLocalDbWithTestData()
         {
-            Database.SetInitializer<NerdDinners>(null);
+            Database.SetInitializer<NerdDinners>(new CreateDatabaseIfNotExistsIncludingUniqueIndices());
 
             var dbContext = new NerdDinners();
-            dbContext.Database.CreateIfNotExists();
             dbContext.Database.ExecuteSqlCommand("TRUNCATE TABLE [Dinners]");
             dbContext.Database.ExecuteSqlCommand("TRUNCATE TABLE [Events]");
 

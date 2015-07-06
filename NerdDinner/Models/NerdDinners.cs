@@ -20,7 +20,7 @@ namespace NerdDinner.Models
     {
         public NerdDinners() 
         {
-            Configuration.LazyLoadingEnabled = false;  
+            Configuration.LazyLoadingEnabled = false;
         }
 
         public DbSet<Dinner> Dinners { get; set; }
@@ -28,4 +28,14 @@ namespace NerdDinner.Models
         public DbSet<Event> Events { get; set; }
 
     }
+
+    public class CreateDatabaseIfNotExistsIncludingUniqueIndices : CreateDatabaseIfNotExists<NerdDinners>
+    {
+        protected override void Seed(NerdDinners context) {
+            base.Seed(context);
+            context.Database.ExecuteSqlCommand("CREATE UNIQUE NONCLUSTERED INDEX IX_UQ_AggergateId_AggregateEventSequence ON dbo.Events ( AggregateId, AggregateEventSequence ) WITH( STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]");
+            context.Database.ExecuteSqlCommand("CREATE UNIQUE NONCLUSTERED INDEX IX_UQ_DinnerGuid ON dbo.Dinners ( DinnerGuid ) WITH( STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON) ON [PRIMARY]");
+        }
+    }
+
 }

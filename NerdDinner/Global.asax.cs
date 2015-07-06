@@ -1,10 +1,12 @@
 ﻿using System;
+using System.Data.Entity;
 using System.Security.Principal;
 using System.Web;
 using System.Web.Mvc;
 using System.Web.Routing;
 using System.Web.Security;
 using System.Reflection;
+using NerdDinner.Models;
 using StackExchange.Profiling;
 
 namespace NerdDinner
@@ -29,6 +31,8 @@ namespace NerdDinner
             AreaRegistration.RegisterAllAreas();
             FilterConfig.RegisterGlobalFilters(GlobalFilters.Filters);            
             RouteConfig.RegisterRoutes(RouteTable.Routes);
+
+            Database.SetInitializer<NerdDinners>(new CreateDatabaseIfNotExistsIncludingUniqueIndices());
         }
 
         void MvcApplication_PostAuthenticateRequest(object sender, EventArgs e)
