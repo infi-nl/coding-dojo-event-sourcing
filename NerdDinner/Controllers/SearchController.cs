@@ -80,6 +80,7 @@ namespace NerdDinner.Controllers
             if (!limit.HasValue)
                 limit = 40;
 
+            // TODO Infi Coding Dojo: optimize this
             var mostPopularDinners = from dinner in Dinner.HydrateAll(dinners.ToList(), dinnerRepository.AllEvents.ToList())
                                      orderby dinner.RSVPs.Count descending
                                      select dinner;

@@ -206,8 +206,8 @@ namespace NerdDinner.Controllers {
         {
             _nerdIdentity = this.nerdIdentity;
 
-            
 
+            // TODO Infi Coding Dojo: optimize this
             var userDinners = from dinner in Dinner.HydrateAll(dinnerRepository.All.ToList(), dinnerRepository.AllEvents.ToList())
                               where
                                 (
