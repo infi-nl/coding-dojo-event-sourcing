@@ -153,14 +153,17 @@ namespace NerdDinner.Tests.CodingDojo
             return (T)viewResult.Data;
         }
 
-        void AssertEventPublished<T>(Action<Event<T>> assertOn) where T : IEventData{
-			var e = _publishedEvents.FirstOrDefault(p=>p.EventType == typeof(T).FullName);
+        void AssertEventPublished<T>(Func<Event<T>,bool> filter, Action<Event<T>> assertOn) where T : IEventData{
+			var events = _publishedEvents
+                .Where(p=>p.EventType == typeof(T).FullName)
+                .Select(e=>(Event<T>)e.AddEventType())
+                .Where(filter)
+                .ToList();
+            
+            Assert.AreNotEqual(0, events.Count, "event not found");            
+            Assert.AreEqual(1, events.Count, "Expected to find exactly one event");            
 
-			Assert.NotNull(e, "event not published");
-
-			dynamic strongEvent = e.AddEventType();
-
-			assertOn((Event<T>)strongEvent);
+			assertOn(events.First());
 		}
     }
 }

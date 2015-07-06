@@ -80,7 +80,7 @@ namespace NerdDinner.Tests.CodingDojo
         public void An_RSVPed_Event_Is_Published_When_RSVPing() {
             RSVPForDinner("freek", 1);
 
-			AssertEventPublished<RSVPed>(e=> {
+			AssertEventPublished<RSVPed>(e=>true,e=> {
 				Assert.AreEqual("freek", e.Data.FriendlyName, "Username not correct in event");
 				Assert.AreEqual(1, e.Data.DinnerId, "DinnerId not correct in event");
 			});
