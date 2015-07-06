@@ -1,4 +1,6 @@
-﻿using System.Configuration;
+﻿using System;
+using System.Collections.Generic;
+using System.Configuration;
 using System.Data.Common;
 using System.Data.Entity;
 using System.Data.Entity.Infrastructure;
@@ -27,6 +29,28 @@ namespace NerdDinner.Models
         
         public DbSet<Event> Events { get; set; }
 
+        readonly static List<Action<NerdDinners,Event>> _eventPublishedHandlers = new List<Action<NerdDinners,Event>>();
+
+        public static void OnEventsPublished(Action<NerdDinners,Event> handler) {
+            lock(_eventPublishedHandlers) {
+                _eventPublishedHandlers.Add(handler);
+            }
+        }
+
+        public static void ClearEventHandlers() {
+            _eventPublishedHandlers.Clear();
+        }
+
+        internal void StoreEvents(ICollection<Event> events) {
+            foreach (var publishedEvent in events) {
+                Events.Add(publishedEvent);
+            }
+            foreach(var handler in _eventPublishedHandlers) {
+                foreach(var @event in events) {
+                    handler(this,@event);
+                }
+            }
+        }
     }
 
     public class CreateDatabaseIfNotExistsIncludingUniqueIndices : CreateDatabaseIfNotExists<NerdDinners>

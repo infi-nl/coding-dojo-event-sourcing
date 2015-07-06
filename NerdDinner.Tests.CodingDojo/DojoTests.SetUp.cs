@@ -14,11 +14,18 @@ namespace NerdDinner.Tests.CodingDojo
 {
     partial class DojoTests
     {
+        readonly List<Event> _publishedEvents = new List<Event>();
 
         [SetUp]
         public void SetUp()
         {
             InitializeLocalDbWithTestData();
+
+            _publishedEvents.Clear();
+            NerdDinners.ClearEventHandlers();
+            NerdDinners.OnEventsPublished((db,e) => {
+                _publishedEvents.Add(e);
+            });
         }
 
         private static void InitializeLocalDbWithTestData()

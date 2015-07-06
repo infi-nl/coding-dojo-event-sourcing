@@ -15,7 +15,7 @@ namespace NerdDinner.Models
         public DateTimeOffset DateTime    { get; set; }
         public int AggregateEventSequence { get; set; }
 
-        internal dynamic AddEventType()
+        public dynamic AddEventType()
         {
             //SOMETHING MAGICAL
             var type = Type.GetType(EventType);

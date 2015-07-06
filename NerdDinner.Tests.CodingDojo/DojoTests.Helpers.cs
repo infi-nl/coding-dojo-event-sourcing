@@ -8,6 +8,7 @@ using NerdDinner.Controllers;
 using NerdDinner.Models;
 using Newtonsoft.Json;
 using NUnit.Framework;
+using NerdDinner.Events;
 
 namespace NerdDinner.Tests.CodingDojo
 {
@@ -152,6 +153,17 @@ namespace NerdDinner.Tests.CodingDojo
             return (T)viewResult.Data;
         }
 
-    }
+        void AssertEventPublished<T>(Func<Event<T>,bool> filter, Action<Event<T>> assertOn) where T : IEventData{
+			var events = _publishedEvents
+                .Where(p=>p.EventType == typeof(T).FullName)
+                .Select(e=>(Event<T>)e.AddEventType())
+                .Where(filter)
+                .ToList();
+            
+            Assert.AreNotEqual(0, events.Count, "event not found");            
+            Assert.AreEqual(1, events.Count, "Expected to find exactly one event");            
 
+			assertOn(events.First());
+		}
+    }
 }
