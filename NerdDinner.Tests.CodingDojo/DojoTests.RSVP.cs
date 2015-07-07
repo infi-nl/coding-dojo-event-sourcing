@@ -18,6 +18,18 @@ namespace NerdDinner.Tests.CodingDojo
             AssertRSVPedForDinner("scottha", dinnerID);
         }
 
+		[Test]
+        public void CreateDinner_Should_Raise_RSVPed()
+        {
+            var dinnerID = CreateDinner();
+
+            AssertEventPublished<RSVPed>(e=>true,e=> {
+				Assert.AreEqual(dinnerID, e.Data.DinnerId, "DinnerID");
+				Assert.AreEqual("scottha", e.Data.FriendlyName, "FriendlyName");
+				Assert.AreEqual("scottha", e.Data.Name, "Name");
+			});
+        }
+
         [Test]
         public void CreateDinner_Twice_Should_Work()
         {
