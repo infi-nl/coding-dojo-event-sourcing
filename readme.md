@@ -14,16 +14,23 @@ In our implementation based on Event Sourcing, specific actions trigger events t
 
 ### Assignments
 
-During the Coding Dojo the participants are expected to expand the application by implementing new features of modifying existing features. Listed below (in suggested order) are the requested changes to the application:
+During the Coding Dojo the participants are expected to expand the application by implementing new features of modifying existing features. Make sure you keep runing the tests (of which most will fail initially) to see if you are going in the right direction, and also be sure to write your own tests if needed. 
 
-1.  Implement canceling an RSVP
-2.  Show a history of events (activity feed) on the dinner detail page
-3.  Implement changing a dinner's address (using Event Sourcing)
-    - A UI implementation already exists in /Views/Dinners/Detail.cshtml (remove '&& false' from the if statement)
+Listed below (in suggested order) are the requested changes to the application:
 
-Basic unit tests for these assignments already exist (and are expected to fail initially, until these features are implemented). Some tests expect specific text values, so these may be changed if needed.
+**1 - Cancel an RSVP**
 
-##### Additional assingment
+Currently, only registering an RSVP is implemented. However, the UI also supports canceling an RSVP, so this also has to be implemented in the backend. The most obvious place to start would be in *RSVPController.Cancel()*. Take note of the implementation for registering an RSVP, as canceling will likely be very simliar
+    
+**2 - Show a history of events (activity feed) on the dinner detail page**
+
+Now that we have some basic events for a dinner, we would like to have an overview on the dinner detail page to show what has happened (and when) concerning that dinner. A UI implementation has already been created, which reads from the *Dinner.History* property. Ensure this property is filled with the right data and it will show up on the dinner detail page.
+
+**3 - Changing a dinner's address (using Event Sourcing)**
+
+Editing a dinner is already implemented using a basic CRUD and DB mapping. The assignment here is to extract a single property of a dinner (in this case the Address) and store changes to this property using Event Sourcing. We have already created a UI implementation in /Views/Dinners/Detail.cshtml, simply remove '&& false' from the if statement. When clicking the address (as a dinner's host) an edit form will appear. The form will submit the data to DinnerController.ChangeAddress(), which now has to be implemented.
+
+**4 - Specialized queries**
 
 If there is enough time, you can attempt to optimize the hydrating of events when performing specific queries. A good example of this can be found in SearchController.GetMostPopularDinners(), which has to retrieve all dinners and all events from the database before hydrating the events to the corresponding dinners (in-memory), before actually filtering and selecting the dinners that are most popular. Obviously, this can be improved dramatically if the query could be done in the database instead of in-memory. 
 
