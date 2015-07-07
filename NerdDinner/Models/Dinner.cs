@@ -123,7 +123,7 @@ namespace NerdDinner.Models {
         private void RaiseAndApply(IEventData eventData) {
             var @event = MakeEvent(eventData);
             RaiseEvent(@event);
-            ApplyEvent(@event);
+            Apply(@event);
         }
 
         private Event MakeEvent(IEventData eventDataObject) {
@@ -141,7 +141,7 @@ namespace NerdDinner.Models {
             _currentEvent++;
         }
         
-        void ApplyEvent(Event e) {
+        void Apply(Event e) {
             ApplyEvent(e.AddEventType());
         }
 
@@ -160,7 +160,7 @@ namespace NerdDinner.Models {
                 if (e.AggregateEventSequence != _currentEvent) {
                     throw new Exception("Unexpected event sequence");
                 }
-                ApplyEvent(e);
+                Apply(e);
                 _currentEvent++;
             }
         }
