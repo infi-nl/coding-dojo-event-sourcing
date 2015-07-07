@@ -99,27 +99,6 @@ namespace NerdDinner.Models {
 
         private readonly List<Event> _publishedEvents = new List<Event>();
 
-        public ICollection<Event> RSVP(string name, string friendlyName) {
-            try {
-                if (IsUserRegistered(name)) {
-                    return new List<Event>();
-                }
-
-                var RSVPedEvent = new RSVPed {
-                    Name         = name,
-                    FriendlyName = friendlyName,
-                    DinnerId     = DinnerID
-                };
-
-                RaiseAndApply(RSVPedEvent);
-
-                return this._publishedEvents.ToList();
-            }
-            finally {
-                this._publishedEvents.Clear();
-            }
-        }
-
         private void RaiseAndApply(IEventData eventData) {
             var @event = MakeEvent(eventData);
             RaiseEvent(@event);
@@ -145,16 +124,6 @@ namespace NerdDinner.Models {
             ApplyEvent(e.AddEventType());
         }
 
-        void ApplyEvent(Event<RSVPed> @event) {
-            var rsvp = new RSVP();
-            rsvp.DinnerID       = this.DinnerID;
-            rsvp.AttendeeName   = @event.Data.FriendlyName;
-            rsvp.AttendeeNameId = @event.Data.Name;
-            _rsvps.Add(rsvp);
-        }
-
-        
-
         public void Hydrate(ICollection<Event> events) {
             foreach (var e in events.Where(e => e.AggregateEventSequence >= _currentEvent).OrderBy(e => e.AggregateEventSequence)) { 
                 if (e.AggregateEventSequence != _currentEvent) {
@@ -170,6 +139,36 @@ namespace NerdDinner.Models {
                 dinner.Hydrate(events.Where(e => e.AggregateId == dinner.DinnerGuid).ToList());
             }
             return dinners;
+        }
+
+
+		public ICollection<Event> RSVP(string name, string friendlyName) {
+            try {
+                if (IsUserRegistered(name)) {
+                    return new List<Event>();
+                }
+
+                var RSVPedEvent = new RSVPed {
+                    Name         = name,
+                    FriendlyName = friendlyName,
+                    DinnerId     = DinnerID
+                };
+
+                RaiseAndApply(RSVPedEvent);
+
+                return this._publishedEvents.ToList();
+            }
+            finally {
+                this._publishedEvents.Clear();
+            }
+        }
+
+        void ApplyEvent(Event<RSVPed> @event) {
+            var rsvp = new RSVP();
+            rsvp.DinnerID       = this.DinnerID;
+            rsvp.AttendeeName   = @event.Data.FriendlyName;
+            rsvp.AttendeeNameId = @event.Data.Name;
+            _rsvps.Add(rsvp);
         }
 
     }
