@@ -97,8 +97,6 @@ namespace NerdDinner.Models {
             }
         }
 
-        private readonly List<Event> _publishedEvents = new List<Event>();
-
         private void RaiseAndApply(IEventData eventData) {
             var @event = MakeEvent(eventData);
             RaiseEvent(@event);
@@ -116,7 +114,7 @@ namespace NerdDinner.Models {
         }
 
         private void RaiseEvent(Event e) {
-            _publishedEvents.Add(e);
+            EventScope.Raise(e);
             _currentEvent++;
         }
         
@@ -143,9 +141,9 @@ namespace NerdDinner.Models {
 
 
 		public ICollection<Event> RSVP(string name, string friendlyName) {
-            try {
+            return EventScope.Start(()=>{
                 if (IsUserRegistered(name)) {
-                    return new List<Event>();
+                    return;
                 }
 
                 var RSVPedEvent = new RSVPed {
@@ -155,12 +153,7 @@ namespace NerdDinner.Models {
                 };
 
                 RaiseAndApply(RSVPedEvent);
-
-                return this._publishedEvents.ToList();
-            }
-            finally {
-                this._publishedEvents.Clear();
-            }
+            });
         }
 
         void ApplyEvent(Event<RSVPed> @event) {
