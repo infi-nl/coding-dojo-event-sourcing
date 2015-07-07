@@ -12,18 +12,28 @@ namespace NerdDinner.Tests.CodingDojo {
     partial class DojoTests {
         [Test]
         public void GetPopularDinners_Is_Populated_From_PopularDinners_ReadModel() {
-            PopulatePopularDinnerReadModelForDinner(1, 10);
-            PopulatePopularDinnerReadModelForDinner(3, 5);
-            PopulatePopularDinnerReadModelForDinner(4, 15);
+            PopulatePopularDinnerReadModelForDinner(dinnerId:1, rsvpCount:10);
+            PopulatePopularDinnerReadModelForDinner(dinnerId:3, rsvpCount:5);
+            PopulatePopularDinnerReadModelForDinner(dinnerId:4, rsvpCount:15);
 
+            var dinners = GetMostPopularDinners();
+
+            var mostPopular = dinners.First();
+
+            Assert.AreEqual(4,mostPopular.DinnerID,"Not the expected dinner");
+            Assert.AreEqual(15, mostPopular.RSVPCount, "RSVP count is wrong");
+
+            var secondPopular = dinners.Skip(1).First();
+
+            Assert.AreEqual(1,secondPopular.DinnerID,"Not the expected dinner");
+            Assert.AreEqual(10, secondPopular.RSVPCount, "RSVP count is wrong");
+        }
+
+        private ICollection<JsonDinner> GetMostPopularDinners() {
             var result = CreateSearchControllerAs("freek").GetMostPopularDinners(10);
 
             var model = GetDataFromJsonResult<ICollection<JsonDinner>>(result);
-
-            var firstResult = model.First();
-
-            Assert.AreEqual(4,firstResult.DinnerID,"most popular dinner is not correct");
-            Assert.AreEqual(15, firstResult.RSVPCount, "RSVP count is wrong");
+            return model;
         }
 
         private void PopulatePopularDinnerReadModelForDinner(int dinnerId, int rsvpCount)
