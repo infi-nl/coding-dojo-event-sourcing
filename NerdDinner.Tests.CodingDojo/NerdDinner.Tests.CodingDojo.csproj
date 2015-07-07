@@ -94,7 +94,6 @@
   <ItemGroup>
     <None Include="App.config" />
     <Compile Include="DojoTests.SetUp.cs" />
-    <Compile Include="DojoTests.Part4MyDinners.cs" />
     <None Include="packages.config" />
   </ItemGroup>
   <Choose>
