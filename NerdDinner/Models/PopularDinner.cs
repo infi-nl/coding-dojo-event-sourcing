@@ -1,4 +1,5 @@
-﻿using System;
+﻿using NerdDinner.Events;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
@@ -8,6 +9,8 @@ namespace NerdDinner.Models
 {
     public class PopularDinner
     {
+        //TODO: add concurrency control
+
         [Key]
         [DatabaseGenerated(DatabaseGeneratedOption.None)]
         public int DinnerID { get; set; }
@@ -23,5 +26,20 @@ namespace NerdDinner.Models
         public string HostedById { get; set; }
 
         public int RSVPCount { get; set; }
+
+        public static void Handle(NerdDinners context, Event @event) {
+            if(Type.GetType(@event.EventType) ==  typeof(RSVPed)) {
+                Handle(context,(Event<RSVPed>)@event.AddEventType());
+            }
+        }
+
+        private static void Handle(NerdDinners context,Event<RSVPed> @event) {
+            var popular = context.PopularDinners.Find(@event.Data.DinnerId);
+            if(popular == null) {
+                throw new InvalidOperationException("Couldn't find dinner with id "+@event.Data.DinnerId);
+            }
+
+            popular.RSVPCount++;
+        }
     }
 }

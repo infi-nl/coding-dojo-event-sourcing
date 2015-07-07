@@ -29,6 +29,27 @@ namespace NerdDinner.Tests.CodingDojo {
             Assert.AreEqual(10, secondPopular.RSVPCount, "RSVP count is wrong");
         }
 
+        [Test]
+        public void PopularDinners_Updates_RSVP_Count_on_RSVPed() {
+            PopulatePopularDinnerReadModelForDinner(dinnerId:1, rsvpCount:0);
+            
+            Raise(new RSVPed { DinnerId = 1, FriendlyName = "freek", Name = "freek" });
+
+            AssertRSVPCountFor(dinnerId:1, expectedCount:1);
+        }
+
+        private static void Raise(RSVPed rsvped) {
+            var dinners = new NerdDinners();
+            PopularDinner.Handle(dinners,Event.Make(rsvped,Guid.NewGuid(),0));
+            dinners.SaveChanges();
+        }
+
+        private void AssertRSVPCountFor(int dinnerId,int expectedCount) {
+            var popular = new NerdDinners().PopularDinners.Find(dinnerId);
+
+            Assert.AreEqual(expectedCount,popular.RSVPCount, "RSVP count was wrong");
+        }
+
         private ICollection<JsonDinner> GetMostPopularDinners() {
             var result = CreateSearchControllerAs("freek").GetMostPopularDinners(10);
 

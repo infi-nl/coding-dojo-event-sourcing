@@ -127,7 +127,7 @@ namespace NerdDinner.Models
 
 
         private void RaiseAndApply(IEventData eventData) {
-            var @event = MakeEvent(eventData);
+            var @event = Event.Make(eventData, DinnerGuid,_currentEvent);
             RaiseEvent(@event);
             ApplyEvent(@event);
         }
@@ -139,15 +139,7 @@ namespace NerdDinner.Models
             _currentEvent++;
         }
 
-        private Event MakeEvent(IEventData eventDataObject) {
-            return new Event {
-                AggregateId = DinnerGuid, 
-                AggregateEventSequence = _currentEvent, 
-                DateTime = DateTime.UtcNow, 
-                EventType = eventDataObject.GetType().FullName, 
-                Data = JsonConvert.SerializeObject(eventDataObject)
-            };
-        }
+        
 
         void ApplyEvent(Event e) {
             ApplyEvent(e.AddEventType());
