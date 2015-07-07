@@ -2,8 +2,8 @@
 using NerdDinner.Events;
 using Newtonsoft.Json;
 
-namespace NerdDinner.Models
-{
+namespace NerdDinner.Models {
+
     public class Event {
 
         public int            Id          { get; set; }
@@ -15,8 +15,7 @@ namespace NerdDinner.Models
         public DateTimeOffset DateTime    { get; set; }
         public int AggregateEventSequence { get; set; }
 
-        public dynamic AddEventType()
-        {
+        public dynamic AddEventType() {
             //SOMETHING MAGICAL
             var type = Type.GetType(EventType);
             dynamic data = JsonConvert.DeserializeObject(Data, type);
@@ -27,8 +26,7 @@ namespace NerdDinner.Models
 
             instance.Data = data;
 
-            foreach (var prop in typeof(Event).GetProperties())
-            {
+            foreach (var prop in typeof(Event).GetProperties()) {
                 prop.SetValue(instance, prop.GetValue(this, null), null);
             }
 
@@ -38,6 +36,6 @@ namespace NerdDinner.Models
 
     public class Event<T> : Event where T : IEventData {
         public new T Data { get; set;}
-
     }
+
 }
