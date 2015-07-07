@@ -136,10 +136,13 @@ namespace NerdDinner.Controllers {
                 dinner.HostedBy = this.nerdIdentity.FriendlyName;
                 dinner.DinnerGuid = Guid.NewGuid();
 
-                var events = dinner.RSVP(this.nerdIdentity.Name, this.nerdIdentity.FriendlyName);
-                dinnerRepository.StoreEvents(events);
- 
                 dinnerRepository.InsertOrUpdate(dinner);
+                dinnerRepository.SubmitChanges();
+
+                var createdEvents = dinner.Created();
+                var rsvpedEvents = dinner.RSVP(this.nerdIdentity.Name, this.nerdIdentity.FriendlyName);
+                dinnerRepository.StoreEvents(createdEvents);
+                dinnerRepository.StoreEvents(rsvpedEvents);
                 dinnerRepository.SubmitChanges();
 
                 return RedirectToAction("Details", new { id=dinner.DinnerID });

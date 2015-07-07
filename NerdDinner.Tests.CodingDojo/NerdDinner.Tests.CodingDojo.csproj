@@ -76,6 +76,7 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
+    <Compile Include="DojoTests.CreateDinner.cs" />
     <Compile Include="DojoTests.Part3.cs" />
     <Compile Include="DojoTests.Part2.cs" />
     <Compile Include="DojoTests.Helpers.cs" />

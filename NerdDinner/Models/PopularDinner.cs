@@ -28,6 +28,9 @@ namespace NerdDinner.Models
         public int RSVPCount { get; set; }
 
         public static void Handle(NerdDinners context, Event @event) {
+            if(Type.GetType(@event.EventType) ==  typeof(DinnerCreated)) {
+                Handle(context,(Event<DinnerCreated>)@event.AddEventType());
+            }
             if(Type.GetType(@event.EventType) ==  typeof(RSVPed)) {
                 Handle(context,(Event<RSVPed>)@event.AddEventType());
             }
@@ -40,6 +43,24 @@ namespace NerdDinner.Models
             }
 
             popular.RSVPCount++;
+        }
+
+        private static void Handle(NerdDinners context,Event<DinnerCreated> @event) {
+            var popular = new PopularDinner {
+                Address = @event.Data.Address,
+                ContactPhone = @event.Data.ContactPhone,
+                Country = @event.Data.Country,
+                Description = @event.Data.Description,
+                DinnerID = @event.Data.DinnerID,
+                EventDate = @event.Data.EventDate,
+                HostedBy = @event.Data.HostedBy,
+                HostedById = @event.Data.HostedById,
+                Latitude = @event.Data.Latitude,
+                Longitude = @event.Data.Longitude,
+                RSVPCount = 0,
+                Title = @event.Data.Title
+            };
+            context.PopularDinners.Add(popular);
         }
     }
 }

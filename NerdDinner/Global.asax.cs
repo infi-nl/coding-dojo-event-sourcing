@@ -34,7 +34,6 @@ namespace NerdDinner
 
             Database.SetInitializer<NerdDinners>(new CreateDatabaseIfNotExistsIncludingUniqueIndices());
 
-            NerdDinners.OnEventsPublished(RSVPEventHandler.OnEventPublished);
         }
 
         void MvcApplication_PostAuthenticateRequest(object sender, EventArgs e)

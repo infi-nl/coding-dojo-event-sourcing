@@ -38,6 +38,33 @@ namespace NerdDinner.Tests.CodingDojo {
             AssertRSVPCountFor(dinnerId:1, expectedCount:1);
         }
 
+        [Test]
+        public void Create_Dinner_Should_Create_Popular_Dinner_Record() {
+            NerdDinners.OnEventsPublished(PopularDinner.Handle);
+
+            var dinnerID = CreateDinner(new Dinner { 
+                Title = "TestDinner", 
+                EventDate = new DateTime(2016, 1, 1), 
+                Description = "TestDinner Description", 
+                ContactPhone = "0123456789", 
+                Address = "TestDinner Address", 
+                Country = "Europe" });
+
+            var popular = new NerdDinners().PopularDinners.Find(dinnerID);
+
+            Assert.IsNotNull(popular,"Popular dinner not found");
+
+            Assert.AreEqual(dinnerID,popular.DinnerID);
+            Assert.AreEqual("TestDinner",popular.Title);
+            Assert.AreEqual(new DateTime(2016, 1, 1),popular.EventDate); 
+            Assert.AreEqual("TestDinner Description",popular.Description);
+            Assert.AreEqual("scottha", popular.HostedBy);
+            Assert.AreEqual("scottha",popular.HostedById);
+            Assert.AreEqual("0123456789", popular.ContactPhone);
+            Assert.AreEqual("TestDinner Address",popular.Address);
+            Assert.AreEqual("Europe", popular.Country);
+        }
+
         private static void Raise(RSVPed rsvped) {
             var dinners = new NerdDinners();
             PopularDinner.Handle(dinners,Event.Make(rsvped,Guid.NewGuid(),0));
