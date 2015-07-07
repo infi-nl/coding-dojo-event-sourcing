@@ -33,6 +33,8 @@ namespace NerdDinner
             RouteConfig.RegisterRoutes(RouteTable.Routes);
 
             Database.SetInitializer<NerdDinners>(new CreateDatabaseIfNotExistsIncludingUniqueIndices());
+
+            NerdDinners.OnEventsPublished(RSVPEventHandler.OnEventPublished);
         }
 
         void MvcApplication_PostAuthenticateRequest(object sender, EventArgs e)

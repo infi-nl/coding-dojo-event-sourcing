@@ -16,6 +16,7 @@ namespace NerdDinner.Models
 
         DbSet<Dinner> Dinners { get; set; }
         DbSet<Models.Event> Events { get; set; }
+        DbSet<Models.PopularDinner> PopularDinners { get; set; }
     }
 
     public class NerdDinners : DbContext, INerdDinners
@@ -25,9 +26,15 @@ namespace NerdDinner.Models
             Configuration.LazyLoadingEnabled = false;
         }
 
+        protected override void OnModelCreating(DbModelBuilder modelBuilder) {
+            base.OnModelCreating(modelBuilder);
+        }
+
         public DbSet<Dinner> Dinners { get; set; }
         
         public DbSet<Event> Events { get; set; }
+        public DbSet<Models.PopularDinner> PopularDinners { get; set; }
+
 
         readonly static List<Action<NerdDinners,Event>> _eventPublishedHandlers = new List<Action<NerdDinners,Event>>();
 

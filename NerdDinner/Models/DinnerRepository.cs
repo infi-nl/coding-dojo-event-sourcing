@@ -49,6 +49,11 @@ namespace NerdDinner.Models
                    select dinner;
         }
 
+        public IQueryable<PopularDinner> FindMostPopularDinners()
+        {
+            return db.PopularDinners.OrderByDescending(p => p.RSVPCount);
+        } 
+
         public IQueryable<Dinner> FindDinnersByText(string q)
         {
             return All
@@ -100,9 +105,8 @@ namespace NerdDinner.Models
 
         public void StoreEvents(ICollection<Event> events) {
             db.StoreEvents(events);
-            
         }
-
+            
         public IQueryable<Event> AllEvents {
             get {
                 return db.Events;

@@ -11,7 +11,7 @@ using Newtonsoft.Json;
 
 namespace NerdDinner.Models
 {
-    public class Dinner
+    public class Dinner 
     {
         [HiddenInput(DisplayValue = false)]
         public int DinnerID { get; set; }
@@ -68,7 +68,6 @@ namespace NerdDinner.Models
                 return _rsvps.AsReadOnly();
             }
         }
-
 
         public bool IsHostedBy(string userName)
         {

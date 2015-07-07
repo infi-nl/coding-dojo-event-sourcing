@@ -185,6 +185,9 @@
     <Compile Include="Helpers\UnityDependencyResolver.cs" />
     <Compile Include="Helpers\UrlHelperExtensions.cs" />
     <Compile Include="Models\AccountModels.cs" />
+    <Compile Include="Models\PopularDinner.cs" />
+    <Compile Include="Models\RSVPCount.cs" />
+    <Compile Include="Models\RSVPEventHandler.cs" />
     <Compile Include="Models\Event.cs" />
     <Compile Include="Events\RSVPed.cs" />
     <Compile Include="Models\Dinner.cs" />
