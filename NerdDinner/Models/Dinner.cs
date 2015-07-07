@@ -125,11 +125,34 @@ namespace NerdDinner.Models
             }
         }
 
+        internal ICollection<Event> Created() {
+            try {
+                var created = new DinnerCreated {
+                    Address = Address,
+                    ContactPhone = ContactPhone,
+                    Country = Country,
+                    Description = Description,
+                    DinnerID = DinnerID,
+                    EventDate = EventDate,
+                    HostedBy = HostedBy,
+                    HostedById = HostedById,
+                    Latitude = Latitude,
+                    Longitude = Longitude,
+                    Title = Title
+                };
+                RaiseAndApply(created);
+                return this._publishedEvents.ToList();
+            }
+            finally {
+                this._publishedEvents.Clear();
+            }
+        }
+
 
         private void RaiseAndApply(IEventData eventData) {
-            var @event = MakeEvent(eventData);
+            var @event = Event.Make(eventData, DinnerGuid,_currentEvent);
             RaiseEvent(@event);
-            ApplyEvent(@event);
+            Apply(@event);
         }
 
         private readonly List<Event> _publishedEvents = new List<Event>();
@@ -139,17 +162,9 @@ namespace NerdDinner.Models
             _currentEvent++;
         }
 
-        private Event MakeEvent(IEventData eventDataObject) {
-            return new Event {
-                AggregateId = DinnerGuid, 
-                AggregateEventSequence = _currentEvent, 
-                DateTime = DateTime.UtcNow, 
-                EventType = eventDataObject.GetType().FullName, 
-                Data = JsonConvert.SerializeObject(eventDataObject)
-            };
-        }
+        
 
-        void ApplyEvent(Event e) {
+        void Apply(Event e) {
             ApplyEvent(e.AddEventType());
         }
 
@@ -161,6 +176,9 @@ namespace NerdDinner.Models
             _rsvps.Add(rsvp);
         }
 
+        void ApplyEvent(Event<DinnerCreated> @event) {
+            
+        }
         
 
         public void Hydrate(ICollection<Event> events)
@@ -170,7 +188,7 @@ namespace NerdDinner.Models
                 if (e.AggregateEventSequence != _currentEvent) {
                     throw new Exception("Unexpected event sequence");
                 }
-                ApplyEvent(e);
+                Apply(e);
                 _currentEvent++;
             }
         }
@@ -183,6 +201,8 @@ namespace NerdDinner.Models
         }
 
 
+
+        
     }
 
     public class LocationDetail

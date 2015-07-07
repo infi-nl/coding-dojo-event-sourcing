@@ -18,6 +18,10 @@ namespace NerdDinner.Tests.CodingDojo
         {
             var testDinner = new Dinner { Title = "TestDinner", EventDate = new DateTime(2016, 1, 1), Description = "TestDinner Description", HostedBy = "scottha", HostedById = "scottha", ContactPhone = "0123456789", Address = "TestDinner Address", Country = "Europe" };
 
+            return CreateDinner(testDinner);
+        }
+
+        public int CreateDinner(Dinner testDinner) {
             var controller = CreateDinnersControllerAs("scottha");
             var result = controller.Create(testDinner);
 

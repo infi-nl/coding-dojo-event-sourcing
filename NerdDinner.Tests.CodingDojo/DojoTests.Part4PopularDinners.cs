@@ -12,18 +12,76 @@ namespace NerdDinner.Tests.CodingDojo {
     partial class DojoTests {
         [Test]
         public void GetPopularDinners_Is_Populated_From_PopularDinners_ReadModel() {
-            PopulatePopularDinnerReadModelForDinner(1, 10);
-            PopulatePopularDinnerReadModelForDinner(3, 5);
-            PopulatePopularDinnerReadModelForDinner(4, 15);
+            PopulatePopularDinnerReadModelForDinner(dinnerId:1, rsvpCount:10);
+            PopulatePopularDinnerReadModelForDinner(dinnerId:3, rsvpCount:5);
+            PopulatePopularDinnerReadModelForDinner(dinnerId:4, rsvpCount:15);
 
+            var dinners = GetMostPopularDinners();
+
+            var mostPopular = dinners.First();
+
+            Assert.AreEqual(4,mostPopular.DinnerID,"Not the expected dinner");
+            Assert.AreEqual(15, mostPopular.RSVPCount, "RSVP count is wrong");
+
+            var secondPopular = dinners.Skip(1).First();
+
+            Assert.AreEqual(1,secondPopular.DinnerID,"Not the expected dinner");
+            Assert.AreEqual(10, secondPopular.RSVPCount, "RSVP count is wrong");
+        }
+
+        [Test]
+        public void PopularDinners_Updates_RSVP_Count_on_RSVPed() {
+            PopulatePopularDinnerReadModelForDinner(dinnerId:1, rsvpCount:0);
+            
+            Raise(new RSVPed { DinnerId = 1, FriendlyName = "freek", Name = "freek" });
+
+            AssertRSVPCountFor(dinnerId:1, expectedCount:1);
+        }
+
+        [Test]
+        public void Create_Dinner_Should_Create_Popular_Dinner_Record() {
+            NerdDinners.OnEventsPublished(PopularDinner.Handle);
+
+            var dinnerID = CreateDinner(new Dinner { 
+                Title = "TestDinner", 
+                EventDate = new DateTime(2016, 1, 1), 
+                Description = "TestDinner Description", 
+                ContactPhone = "0123456789", 
+                Address = "TestDinner Address", 
+                Country = "Europe" });
+
+            var popular = new NerdDinners().PopularDinners.Find(dinnerID);
+
+            Assert.IsNotNull(popular,"Popular dinner not found");
+
+            Assert.AreEqual(dinnerID,popular.DinnerID);
+            Assert.AreEqual("TestDinner",popular.Title);
+            Assert.AreEqual(new DateTime(2016, 1, 1),popular.EventDate); 
+            Assert.AreEqual("TestDinner Description",popular.Description);
+            Assert.AreEqual("scottha", popular.HostedBy);
+            Assert.AreEqual("scottha",popular.HostedById);
+            Assert.AreEqual("0123456789", popular.ContactPhone);
+            Assert.AreEqual("TestDinner Address",popular.Address);
+            Assert.AreEqual("Europe", popular.Country);
+        }
+
+        private static void Raise(RSVPed rsvped) {
+            var dinners = new NerdDinners();
+            PopularDinner.Handle(dinners,Event.Make(rsvped,Guid.NewGuid(),0));
+            dinners.SaveChanges();
+        }
+
+        private void AssertRSVPCountFor(int dinnerId,int expectedCount) {
+            var popular = new NerdDinners().PopularDinners.Find(dinnerId);
+
+            Assert.AreEqual(expectedCount,popular.RSVPCount, "RSVP count was wrong");
+        }
+
+        private ICollection<JsonDinner> GetMostPopularDinners() {
             var result = CreateSearchControllerAs("freek").GetMostPopularDinners(10);
 
             var model = GetDataFromJsonResult<ICollection<JsonDinner>>(result);
-
-            var firstResult = model.First();
-
-            Assert.AreEqual(4,firstResult.DinnerID,"most popular dinner is not correct");
-            Assert.AreEqual(15, firstResult.RSVPCount, "RSVP count is wrong");
+            return model;
         }
 
         private void PopulatePopularDinnerReadModelForDinner(int dinnerId, int rsvpCount)
