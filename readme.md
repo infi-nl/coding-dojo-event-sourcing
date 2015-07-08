@@ -4,6 +4,8 @@ This is the codebase used for our [Coding Dojo](http://code.joejag.com/2009/the-
 
 The main functionality of the (stripped down) NerdDinner application is the ability to host and find dinners, as well as RSVP to specific dinners. Initially, the flow for a user to RSVP to a dinner has been implemented using Event Sourcing techniques. Furthermore, a set of unit tests has been created to cover the basic use cases for the RSVP funciontality, as well as additional tests that are expected to cover new functionality added during the Coding Dojo.
 
+For more information about the dojo, please see [this presentation](coding-dojo-event-sourcing.pptx).
+
 ### Requirements
 
 In order to run this application you need Visual Studio (tested on version 2012) as well as [SQL Server](http://www.hanselman.com/blog/DownloadSQLServerExpress.aspx) (tested on version 2012). Simply build the solution and run the tests. You can also run the application and see if registering a user and hosting a dinner works properly. If any issues occur here, please let us know.
