@@ -1,4 +1,8 @@
-#Infi Coding Dojo - Event Sourcing
+# Infi Coding Dojo - Event Sourcing
+
+----
+**⚠ Warning:** This repository is _frozen in time_, and getting no new (security) updates. It is left public, should it help and offer some guidance around its subjects to future visitors. However, for latest guidance on involved subjects, we recommend going to the official sources.
+----
 
 This is the codebase used for our [Coding Dojo](http://code.joejag.com/2009/the-coding-dojo.html) session on [Event Sourcing](https://msdn.microsoft.com/en-us/library/jj591559.aspx) (scheduled for July 7th, 2015). The code consists a stripped down version of the [NerdDinner](http://www.nerddinner.com) application, with a basic Event Sourcing set-up already implemented.
 
